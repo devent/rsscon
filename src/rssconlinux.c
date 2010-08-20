@@ -273,7 +273,7 @@ bool setupPortdata(RssconlinuxPortdata* portdata) {
 	return true;
 }
 
-bool rssconSetupInterface(Rsscon* rsscon) {
+bool rssconSetupInterface(Rsscon rsscon) {
 #ifdef RSSCON_LOGING
 	printf("%d: rssconlinuxSetupInterface...\n", __LINE__);
 #endif

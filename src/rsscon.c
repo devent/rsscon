@@ -1,9 +1,6 @@
 #include <assert.h>
 #include "rsscon.h"
 
-/**
- * Structure defines the public interface to rsscon.
- */
 typedef struct {
 
 	/**
@@ -11,59 +8,50 @@ typedef struct {
 	 */
 	bool open;
 
-	/**
-	 * The port data to use the port.
-	 */
-	void* portdata;
+} RssconPrivate;
 
-	RssconOpen rssconOpen;
-
-	RssconClose rssconClose;
-
-	RssconWrite rssconWrite;
-
-	RssconRead rssconRead;
-
-	RssconLastError rssconLastError;
-} RssconInterface;
-
-bool rssconOpen(Rsscon rsscon) {
+bool rssconInit(Rsscon* rsscon) {
 	assert(rsscon != NULL);
-	RssconInterface* rssconcast = (RssconInterface*)rsscon;
-	assert(rssconcast->rssconOpen != NULL);
-	return rssconcast->rssconOpen(rsscon);
+	assert(rsscon->private == NULL);
+
+	RssconPrivate private = { 0 };
+	rsscon->private = &private;
+	return true;
 }
 
-bool rssconClose(Rsscon rsscon) {
+bool rssconOpen(Rsscon* rsscon) {
 	assert(rsscon != NULL);
-	RssconInterface* rssconcast = (RssconInterface*)rsscon;
-	assert(rssconcast->rssconClose != NULL);
-	return rssconcast->rssconClose(rsscon);
+	assert(rsscon->rssconOpen != NULL);
+	return rsscon->rssconOpen(rsscon);
 }
 
-bool rssconWrite(Rsscon rsscon, const void* data, size_t length, size_t* wrote) {
+bool rssconClose(Rsscon* rsscon) {
 	assert(rsscon != NULL);
-	RssconInterface* rssconcast = (RssconInterface*)rsscon;
-	assert(rssconcast->rssconWrite != NULL);
-	return rssconcast->rssconWrite(rsscon, data, length, wrote);
+	assert(rsscon->rssconClose != NULL);
+	return rsscon->rssconClose(rsscon);
 }
 
-bool rssconRead(Rsscon rsscon, void* data, size_t length, size_t* red) {
+bool rssconWrite(Rsscon* rsscon, const void* data, size_t length, size_t* wrote) {
 	assert(rsscon != NULL);
-	RssconInterface* rssconcast = (RssconInterface*)rsscon;
-	assert(rssconcast->rssconRead != NULL);
-	return rssconcast->rssconRead(rsscon, data, length, red);
+	assert(rsscon->rssconWrite != NULL);
+	return rsscon->rssconWrite(rsscon, data, length, wrote);
 }
 
-int rssconLastError(Rsscon rsscon) {
+bool rssconRead(Rsscon* rsscon, void* data, size_t length, size_t* red) {
 	assert(rsscon != NULL);
-	RssconInterface* rssconcast = (RssconInterface*)rsscon;
-	assert(rssconcast->rssconLastError != NULL);
-	return rssconcast->rssconLastError(rsscon);
+	assert(rsscon->rssconRead != NULL);
+	return rsscon->rssconRead(rsscon, data, length, red);
 }
 
-bool rssconIsOpen(Rsscon rsscon) {
+int rssconLastError(Rsscon* rsscon) {
 	assert(rsscon != NULL);
-	RssconInterface* rssconcast = (RssconInterface*)rsscon;
-	return rssconcast->open;
+	assert(rsscon->rssconLastError != NULL);
+	return rsscon->rssconLastError(rsscon);
+}
+
+bool rssconIsOpen(Rsscon* rsscon) {
+	assert(rsscon != NULL);
+	RssconPrivate* private = (RssconPrivate*) rsscon->private;
+	assert(private != NULL);
+	return private->open;
 }
