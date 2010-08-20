@@ -34,10 +34,26 @@ START_TEST (testRssconSetupInterface)
 		fail_unless(rsscon.rssconLastError != NULL);
 	}END_TEST
 
+START_TEST (testRssconOpenWithNotSetDevice)
+	{
+		Rsscon rsscon = { 0 };
+		int ret = rssconInit(&rsscon);
+		fail_unless(ret);
+		ret = rssconSetupInterface(&rsscon);
+		fail_unless(ret);
+		ret = rssconOpen(&rsscon);
+		fail_if(ret);
+		int lastError = rssconLastError(&rsscon);
+#ifdef LINUX
+		fail_unless(lastError == RSSLINUX_ERROR_OPENDEVICE);
+#endif
+	}END_TEST
+
 Suite* addCoreTestCase(Suite* s) {
 	TCase *tc_core = tcase_create("core");
 	tcase_add_test (tc_core, testRssconInit);
 	tcase_add_test (tc_core, testRssconSetupInterface);
+	tcase_add_test (tc_core, testRssconOpenWithNotSetDevice);
 	suite_add_tcase(s, tc_core);
 	return s;
 }
