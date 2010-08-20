@@ -8,89 +8,81 @@
 #ifndef RSSCON_H_
 #define RSSCON_H_
 
+#include <stdlib.h>
 #include <stdbool.h>
 
-/**
- *   bool rssconOpen(void* portdata)
- *
- *       Opens the port for read and write access.
- *
- *       portdata: contains all information needed to use the port.
- *       return: true if the function succeeds, false if there was an error.
- */
-typedef bool (*RssconOpen)(void*);
+typedef void* Rsscon;
 
-/**
- *   bool rssconClose(void* portdata)
- *
- *       Closes the port.
- *
- *       portdata: contains all information needed to use the port.
- *       return: true if the function succeeds, false if there was an error.
- */
-typedef bool (*RssconClose)(void*);
+typedef bool (*RssconOpen)(Rsscon);
 
-/**
- *   bool rssconWrite(void* portdata, char* data, size_t length, size_t* writed)
- *
- *       Writes data to the port.
- *
- *       portdata: contains all information needed to use the port.
- *       data: contains the data to write to the port.
- *       length: the length of data to write.
- *       writed: how mush data was really written to the port.
- *       return: true if the function succeeds, false if there was an error.
- */
-typedef bool (*RssconWrite)(void*, const void*, size_t, size_t*);
+typedef bool (*RssconClose)(Rsscon);
 
-/**
- *   bool rssconRead(void* portdata, char* data, size_t length, size_t* read)
- *
- *       Reads data to the port.
- *
- *       portdata: contains all information needed to use the port.
- *       data: the buffer to read to.
- *       length: how mush we want to read.
- *       writed: how mush data was really readed from the port.
- *       return: true if the function succeeds, false if there was an error.
- */
-typedef bool (*RssconRead)(void*, void*, size_t, size_t*);
+typedef bool (*RssconWrite)(Rsscon, const void*, size_t, size_t*);
 
-/**
- *   int rssconLastError(void* portdata)
- *
- *       Get the last error caused by accessing the port.
- *
- *       portdata: contains all information needed to use the port.
- *       return: the code of the last error.
- */
-typedef int (*RssconLastError)(void*);
+typedef bool (*RssconRead)(Rsscon, void*, size_t, size_t*);
 
-/**
- * Structure defines the public interface to rsscon.
- */
-typedef struct {
-	int open; //* is 1 when the port is open and
-	//* ready to read/write, 0 otherwise.
-
-	void* portdata; //* The portdata to use the port.
-
-	RssconOpen rssconOpen; //* Opens the port for read and
-	//* write access.
-
-	RssconClose rssconClose; //* Closes the port.
-
-	RssconWrite rssconWrite; //* Writes data to the port.
-
-	RssconRead rssconRead; //* Reads data to the port.
-
-	RssconLastError rssconLastError; //* Get the last error caused by
-//* accessing the port.
-} Rsscon;
+typedef int (*RssconLastError)(Rsscon);
 
 /**
  * Setup the rsscon public interface.
+ *
+ * rsscon: The public interface to the rsscon driver.
  */
-bool rssconSetupInterface(Rsscon* rsscon);
+bool rssconSetupInterface(Rsscon rsscon);
+
+/**
+ * Opens the port for read and write access.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ * return: true if the function succeeds, false if there was an error.
+ */
+bool rssconOpen(Rsscon rsscon);
+
+/**
+ * Closes the port.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ * return: true if the function succeeds, false if there was an error.
+ */
+bool rssconClose(Rsscon rsscon);
+
+/**
+ * Writes data to the port.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ * data: contains the data to write to the port.
+ * length: the length of data to write.
+ * wrote: how much data was really written to the port.
+ * return: true if the function succeeds, false if there was an error.
+ */
+bool
+rssconWrite(Rsscon rsscon, const void* data, size_t length, size_t* wrote);
+
+/**
+ * Reads data to the port.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ * data: the buffer to read to.
+ * length: how much we want to read.
+ * red: how much data was really red from the port.
+ * return: true if the function succeeds, false if there was an error.
+ */
+bool rssconRead(Rsscon rsscon, void* data, size_t length, size_t* red);
+
+/**
+ * Test if the port is open for read/write.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ * return: True when the port is open and ready to read/write, False otherwise.
+ */
+bool rssconIsOpen(Rsscon rsscon);
+
+/**
+ * Get the last error caused by accessing the port.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ * return: the code of the last error.
+ */
+int rssconLastError(Rsscon rsscon);
 
 #endif /* RSSCON_H_ */
