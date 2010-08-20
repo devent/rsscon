@@ -1,38 +1,42 @@
-/*
- * rsscontest_linux.c
- *
- *  Created on: Aug 19, 2010
- *      Author: devent
- */
-
-#include <stdio.h>
+#include <stdlib.h>
+#include <check.h>
 
 #include "rsscon.h"
 #ifdef LINUX
 #include "rssconlinux.h"
 #endif
 
-void printError(Rsscon* rsscon) {
-	int err = rsscon->rssconLastError(rsscon);
-	fprintf(stderr, "Last Error: %d\n", err);
+START_TEST (testRssconSetupInterface)
+	{
+		Rsscon rsscon = { 0 };
+		int ret = rssconSetupInterface(&rsscon);
+		fail_unless(ret);
+	}END_TEST
+
+Suite* addCoreTestCase(Suite* s) {
+	TCase *tc_core = tcase_create("core");
+	tcase_add_test (tc_core, testRssconSetupInterface);
+	suite_add_tcase(s, tc_core);
+	return s;
 }
 
-void error(Rsscon* rsscon, const char* str) {
-	fprintf(stderr, str);
-	printError(rsscon);
-	scanf("press a key");
+Suite* createRssconSuite(void) {
+	Suite *s = suite_create("rsscon");
+	s = addCoreTestCase(s);
+	return s;
+}
+
+int runSuite(Suite *s) {
+	SRunner *sr = srunner_create(s);
+	srunner_run_all(sr, CK_NORMAL);
+	int ret = srunner_ntests_failed(sr);
+	srunner_free(sr);
+
+	return ret;
 }
 
 int main() {
-	printf("start.");
-	Rsscon rsscon = { 0 };
-	int ret = rssconSetupInterface(&rsscon);
-	if (!ret) {
-		error(&rsscon, "error by rssconSetupInterface()...\n");
-		printf("error.");
-		return 1;
-	}
-
-	printf("done.");
-	return 0;
+	Suite *s = createRssconSuite();
+	int ret = runSuite(s);
+	return (ret == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
