@@ -115,7 +115,7 @@ bool setup(RssconlinuxPortdata* pdata) {
 	return true;
 }
 
-bool rssconlinuxOpen(void* portdata) {
+bool rssconlinuxOpen(Rsscon* portdata) {
 #ifdef RSSCON_LOGING
 	printf("%d: rssconlinuxOpen...\n", __LINE__);
 #endif
@@ -146,7 +146,7 @@ bool rssconlinuxOpen(void* portdata) {
 	return true;
 }
 
-bool rssconlinuxClose(void* portdata) {
+bool rssconlinuxClose(Rsscon* portdata) {
 #ifdef RSSCON_LOGING
 	printf("%d: rssconlinuxClose...\n", __LINE__);
 #endif
@@ -169,7 +169,7 @@ bool rssconlinuxClose(void* portdata) {
 	return true;
 }
 
-bool rssconlinuxWrite(void* portdata, const void* data, size_t length,
+bool rssconlinuxWrite(Rsscon* portdata, const void* data, size_t length,
 		size_t* writed) {
 #ifdef RSSCON_LOGING
 	printf("%d: rssconlinuxWrite...\n", __LINE__);
@@ -205,7 +205,7 @@ bool waittodata(RssconlinuxPortdata* pdata, fd_set* set, struct timeval* tv) {
 	return true;
 }
 
-bool rssconlinuxRead(void* portdata, void* data, size_t length, size_t* readed) {
+bool rssconlinuxRead(Rsscon* portdata, void* data, size_t length, size_t* readed) {
 #ifdef RSSCON_LOGING
 	printf("%d: rssconlinuxRead...\n", __LINE__);
 #endif
@@ -246,7 +246,7 @@ bool rssconlinuxRead(void* portdata, void* data, size_t length, size_t* readed) 
 	return true;
 }
 
-int rssconlinuxLastError(void* portdata) {
+int rssconlinuxLastError(Rsscon* portdata) {
 #ifdef RSSCON_LOGING
 	printf("%d: rssconlinuxLastError...\n", __LINE__);
 #endif
@@ -273,7 +273,7 @@ bool setupPortdata(RssconlinuxPortdata* portdata) {
 	return true;
 }
 
-bool rssconSetupInterface(Rsscon rsscon) {
+bool rssconSetupInterface(Rsscon* rsscon) {
 #ifdef RSSCON_LOGING
 	printf("%d: rssconlinuxSetupInterface...\n", __LINE__);
 #endif
