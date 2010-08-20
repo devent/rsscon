@@ -1,94 +1,96 @@
-#ifndef RSSCON_H
-#define RSSCON_H
+/*
+ * rsscon.h
+ *
+ *  Created on: Aug 19, 2010
+ *      Author: devent
+ */
 
-#ifdef WINDOWS
+#ifndef RSSCON_H_
+#define RSSCON_H_
 
 #include <stdbool.h>
-#include <windows.h>
-#include "noiseread.h"
-
-typedef struct
-{
-    // ##
-    // ## Public Members ##
-    // ##
-
-    // the name of the port, like 'COM8', for ports greater than 9 the
-    // name need to be '//./COMxx'.
-    char portName[256];
-
-    // ##
-    // ## boudRate, parityon, parity, stopBits, byteSize
-    // ## is all set to default vaules with
-    // ## bool rssconwindowsSetupPortdata(RssconwindowsPortdata*), but you
-    // ## can set them seperate.
-    // ##
-
-    // the baud rate, CBR_xxxxx (CBR_115200, ...).
-    DWORD baudRate;
-
-    // TRUE for parity, FALSE for no parity.
-    DWORD parityon;
-
-    // the parity, EVENTPARITY, MARKPARITY, NOPARITY, ODDPARITY, SPACEPARITY.
-    BYTE parity;
-
-    // the stop bits, ONESTOPBIT, ONESSTOPBITS, TWOSTOPBITS.
-    BYTE stopBits;
-
-    // the size of a byte.
-    BYTE byteSize;
-
-    // ##
-    // ## Private Members ##
-    // ##
-
-    // the port handle.
-    HANDLE portHandle;
-
-    // the last error.
-    DWORD lastError;
-} RssconwindowsPortdata;
 
 /**
-* Opens a port with the parameters in portdata.
-*
-* @return true when no error eccur, false otherwise.
-*/
-bool rssconwindowsOpen(void* portdata);
+ *   bool rssconOpen(void* portdata)
+ *
+ *       Opens the port for read and write access.
+ *
+ *       portdata: contains all information needed to use the port.
+ *       return: true if the function succeeds, false if there was an error.
+ */
+typedef bool (*RssconOpen)(void*);
 
 /**
-* Close the port.
-*
-* @return true when no error eccur, false otherwise.
-*/
-bool rssconwindowsClose(void* portdata);
+ *   bool rssconClose(void* portdata)
+ *
+ *       Closes the port.
+ *
+ *       portdata: contains all information needed to use the port.
+ *       return: true if the function succeeds, false if there was an error.
+ */
+typedef bool (*RssconClose)(void*);
 
 /**
-* Read some bytes from the port.
-*
-* @return true when no error eccur, false otherwise.
-*/
-bool rssconwindowsRead(void* portdata, void* data, size_t length, size_t* read);
+ *   bool rssconWrite(void* portdata, char* data, size_t length, size_t* writed)
+ *
+ *       Writes data to the port.
+ *
+ *       portdata: contains all information needed to use the port.
+ *       data: contains the data to write to the port.
+ *       length: the length of data to write.
+ *       writed: how mush data was really written to the port.
+ *       return: true if the function succeeds, false if there was an error.
+ */
+typedef bool (*RssconWrite)(void*, const void*, size_t, size_t*);
 
 /**
-* Write some bytes into the port.
-*
-* @return true when no error eccur, false otherwise.
-*/
-bool rssconwindowsWrite(void* portdata, const void* data, size_t length, size_t* writed);
+ *   bool rssconRead(void* portdata, char* data, size_t length, size_t* read)
+ *
+ *       Reads data to the port.
+ *
+ *       portdata: contains all information needed to use the port.
+ *       data: the buffer to read to.
+ *       length: how mush we want to read.
+ *       writed: how mush data was really readed from the port.
+ *       return: true if the function succeeds, false if there was an error.
+ */
+typedef bool (*RssconRead)(void*, void*, size_t, size_t*);
 
-int rssconwindowsLastError(void* portdata);
+/**
+ *   int rssconLastError(void* portdata)
+ *
+ *       Get the last error caused by accessing the port.
+ *
+ *       portdata: contains all information needed to use the port.
+ *       return: the code of the last error.
+ */
+typedef int (*RssconLastError)(void*);
 
-/*
-* Set default settings to portdata.
-*
-* @return true when no error eccur, false otherwise.
-*/
-bool rssconwindowsSetupPortdata(RssconwindowsPortdata* portdata);
+/**
+ * Structure defines the public interface to rsscon.
+ */
+typedef struct {
+	int open; //* is 1 when the port is open and
+	//* ready to read/write, 0 otherwise.
 
-bool rssconwindowsSetupInterface(NoiseRead* noiseread);
+	void* portdata; //* The portdata to use the port.
 
-#endif
+	RssconOpen rssconOpen; //* Opens the port for read and
+	//* write access.
 
-#endif
+	RssconClose rssconClose; //* Closes the port.
+
+	RssconWrite rssconWrite; //* Writes data to the port.
+
+	RssconRead rssconRead; //* Reads data to the port.
+
+	RssconLastError rssconLastError; //* Get the last error caused by
+//* accessing the port.
+} Rsscon;
+
+/**
+ * Setup the rsscon public interface.
+ */
+bool rssconSetupInterface(Rsscon* rsscon);
+
+#endif /* RSSCON_H_ */
