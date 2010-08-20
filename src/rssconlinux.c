@@ -15,28 +15,23 @@
 
 typedef struct {
 
-	char devicePath[256];
-
-	int lastError;
-
 	bool noblock;
 
 	bool wait;
+
+	speed_t baudrate;
 
 	long tvsec;
 
 	long tvusec;
 
-	struct t_private {
-		int fd;
-		struct termios oldtio, newtio;
-		ssize_t err;
-	} private;
+	int fd;
+
+	struct termios oldtio, newtio;
 
 } RssconlinuxPortdata;
 
-static const char *
-strerrno(int err) {
+static const char * strerrno(int err) {
 	switch (err) {
 	case 0:
 		return "OK";
@@ -81,111 +76,176 @@ strerrno(int err) {
 	}
 }
 
-bool setup(RssconlinuxPortdata* pdata) {
+speed_t translateBaudRate(unsigned int baudrate) {
+	switch (baudrate) {
+	case RSSCON_BAUDRATE_57600:
+		return B57600;
+	case RSSCON_BAUDRATE_115200:
+		return B115200;
+	case RSSCON_BAUDRATE_230400:
+		return B230400;
+	case RSSCON_BAUDRATE_460800:
+		return B460800;
+	case RSSCON_BAUDRATE_500000:
+		return B500000;
+	case RSSCON_BAUDRATE_576000:
+		return B576000;
+	case RSSCON_BAUDRATE_921600:
+		return B921600;
+	case RSSCON_BAUDRATE_1000000:
+		return B1000000;
+	case RSSCON_BAUDRATE_1152000:
+		return B1152000;
+	case RSSCON_BAUDRATE_1500000:
+		return B1500000;
+	case RSSCON_BAUDRATE_2000000:
+		return B2000000;
+	case RSSCON_BAUDRATE_2500000:
+		return B2500000;
+	case RSSCON_BAUDRATE_3000000:
+		return B3000000;
+	case RSSCON_BAUDRATE_3500000:
+		return B3500000;
+	case RSSCON_BAUDRATE_4000000:
+		return B4000000;
+	default:
+		return -1;
+	}
+}
+
+bool rssconlinuxInit(Rsscon* rsscon) {
+#ifdef RSSCON_LOGING
+	printf("%d: rssconlinuxInit...\n", __LINE__);
+#endif
+	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
+	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
+
+	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
+	if (pdata->tvsec < 0) {
+		pdata->tvsec = 5;
+	}
+	if (pdata->tvusec < 1) {
+		pdata->tvusec = pdata->tvsec * 10E6;
+	}
+	pdata->noblock = false;
+	pdata->wait = true;
+
+	return true;
+}
+
+bool setup(Rsscon* rsscon) {
 #ifdef RSSCON_LOGING
 	printf("%d: setup...\n", __LINE__);
 #endif
 
+	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
+	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
+
 	struct termios *tio1, *tio2;
-	int ret = 0;
-	tio1 = &(pdata->private.oldtio);
-	tio2 = &(pdata->private.newtio);
+	tio1 = &(pdata->oldtio);
+	tio2 = &(pdata->newtio);
 
-	if (tcgetattr(pdata->private.fd, tio1))
-		ret = -1;
+	if (tcgetattr(pdata->fd, tio1)) {
+		rssconSetLastError(rsscon, RSSCON_ERROR_SETUPDEVICE);
+		return false;
+	}
 
+	speed_t baudrate = translateBaudRate(rssconGetBaudRate(rsscon));
 	memcpy(tio2, tio1, sizeof(struct termios));
 	cfmakeraw(tio2);
-	cfsetospeed(tio2, RSSCON_BAUD_RATE);
-	cfsetispeed(tio2, RSSCON_BAUD_RATE);
+	cfsetospeed(tio2, baudrate);
+	cfsetispeed(tio2, baudrate);
 #if 0
 	tio2->c_cflag |= CRTSCTS;
 #endif
 	tio2->c_cflag |= CREAD | CLOCAL;
-	tcflush(pdata->private.fd, TCIOFLUSH);
-	if (tcsetattr(pdata->private.fd, TCSANOW, tio2))
-		ret = -1;
-#if 0
-	tcflow(pdata->private.fd, TCOON); tcflow(pdata->private.fd, TCION);
-#endif
-	if (ret == -1) {
-		pdata->lastError = RSSLINUX_ERROR_SETUPDEVICE;
+	tcflush(pdata->fd, TCIOFLUSH);
+	if (tcsetattr(pdata->fd, TCSANOW, tio2)) {
+		rssconSetLastError(rsscon, RSSCON_ERROR_SETUPDEVICE);
 		return false;
 	}
+#if 0
+	tcflow(pdata->fd, TCOON); tcflow(pdata->fd, TCION);
+#endif
+
 	return true;
 }
 
-bool rssconlinuxOpen(Rsscon* portdata) {
+bool rssconlinuxOpen(Rsscon* rsscon) {
 #ifdef RSSCON_LOGING
 	printf("%d: rssconlinuxOpen...\n", __LINE__);
 #endif
 
-	assert(portdata != NULL);
-	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) portdata;
-	assert(pdata->devicePath != NULL);
+	assert(rsscon != NULL);
+	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
 
-	pdata->lastError = 0;
+	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
 
 	int flag = O_RDWR | O_NOCTTY;
-	if (pdata->noblock)
+	if (pdata->noblock) {
 		flag |= O_NONBLOCK;
+	}
 
-	pdata->private.fd = open(pdata->devicePath, flag);
-	if (pdata->private.fd == -1) {
+	const char* device = rssconGetDevice(rsscon);
+	pdata->fd = open(device, flag);
+	if (pdata->fd == -1) {
 		fprintf(stderr, "error open device: %s\n", strerrno(errno));
-		pdata->lastError = RSSLINUX_ERROR_OPENDEVICE;
+		rssconSetLastError(rsscon, RSSCON_ERROR_OPENDEVICE);
 		return false;
 	}
 
-	bool ret = setup(pdata);
+	bool ret = setup(rsscon);
 	if (!ret) {
 		fprintf(stderr, "error setup device.\n");
+		rssconSetLastError(rsscon, RSSCON_ERROR_OPENDEVICE);
 		return false;
 	}
 
 	return true;
 }
 
-bool rssconlinuxClose(Rsscon* portdata) {
+bool rssconlinuxClose(Rsscon* rsscon) {
 #ifdef RSSCON_LOGING
 	printf("%d: rssconlinuxClose...\n", __LINE__);
 #endif
 
-	assert(portdata != NULL);
-	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) portdata;
-	assert(pdata->private.fd != 0);
+	assert(rsscon != NULL);
+	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
+	assert(pdata->fd != 0);
 
-	pdata->lastError = 0;
+	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
 
-	tcflush(pdata->private.fd, TCIOFLUSH);
-	tcsetattr(pdata->private.fd, TCSANOW, &(pdata->private.oldtio));
-	int ret = close(pdata->private.fd);
+	tcflush(pdata->fd, TCIOFLUSH);
+	tcsetattr(pdata->fd, TCSANOW, &(pdata->oldtio));
+	int ret = close(pdata->fd);
 	if (ret != 0) {
-		pdata->lastError = RSSLINUX_ERROR_CLOSEDEVICE;
+		rssconSetLastError(rsscon, RSSCON_ERROR_CLOSEDEVICE);
 		return false;
 	}
 
-	pdata->private.fd = 0;
+	pdata->fd = 0;
 	return true;
 }
 
-bool rssconlinuxWrite(Rsscon* portdata, const void* data, size_t length,
-		size_t* writed) {
+bool rssconlinuxWrite(Rsscon* rsscon, const void* data, size_t length,
+		size_t* wrote) {
 #ifdef RSSCON_LOGING
 	printf("%d: rssconlinuxWrite...\n", __LINE__);
 #endif
 
-	assert(portdata != NULL);
-	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) portdata;
-	assert(pdata->private.fd != 0);
+	assert(rsscon != NULL);
+	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
+	assert(pdata->fd != 0);
 
-	ssize_t ret = write(pdata->private.fd, data, length);
-	tcdrain(pdata->private.fd);
+	ssize_t ret = write(pdata->fd, data, length);
+	tcdrain(pdata->fd);
 	if (ret == -1) {
-		pdata->lastError = RSSLINUX_ERROR_WRITE;
+		rssconSetLastError(rsscon, RSSCON_ERROR_WRITE);
 		return false;
 	}
-	*writed = ret;
+	*wrote = ret;
 
 	return true;
 }
@@ -196,30 +256,32 @@ bool waittodata(RssconlinuxPortdata* pdata, fd_set* set, struct timeval* tv) {
 #endif
 
 	FD_ZERO(set);
-	FD_SET(pdata->private.fd, set);
+	FD_SET(pdata->fd, set);
 	tv->tv_sec = pdata->tvsec;
 	tv->tv_usec = pdata->tvusec;
-	int err = select(pdata->private.fd + 1, set, NULL, NULL, tv);
-	if (err <= 0)
+	int err = select(pdata->fd + 1, set, NULL, NULL, tv);
+	if (err <= 0) {
 		return false;
-	return true;
+	} else {
+		return true;
+	}
 }
 
-bool rssconlinuxRead(Rsscon* portdata, void* data, size_t length, size_t* readed) {
+bool rssconlinuxRead(Rsscon* rsscon, void* data, size_t length, size_t* readed) {
 #ifdef RSSCON_LOGING
 	printf("%d: rssconlinuxRead...\n", __LINE__);
 #endif
 
-	assert(portdata != NULL);
-	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) portdata;
-	assert(pdata->private.fd != 0);
+	assert(rsscon != NULL);
+	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
+	assert(pdata->fd != 0);
 
 	struct timeval tv;
 	fd_set set;
 	ssize_t ret = 0;
 	if (pdata->wait) {
 		if (!waittodata(pdata, &set, &tv)) {
-			pdata->lastError = RSSLINUX_ERROR_READ;
+			rssconSetLastError(rsscon, RSSCON_ERROR_READ);
 			fprintf(stderr, "error wait device.\n");
 			return false;
 		}
@@ -227,49 +289,22 @@ bool rssconlinuxRead(Rsscon* portdata, void* data, size_t length, size_t* readed
 	while (ret == 0) {
 		if (pdata->wait) {
 			if (!waittodata(pdata, &set, &tv)) {
-				pdata->lastError = RSSLINUX_ERROR_READ;
+				rssconSetLastError(rsscon, RSSCON_ERROR_READ);
 				fprintf(stderr, "error wait device.\n");
 				return false;
 			}
 		}
-		ret = read(pdata->private.fd, data, length);
+		ret = read(pdata->fd, data, length);
 		if (ret == -1)
 			break;
 	}
 	if (ret == -1) {
-		pdata->lastError = RSSLINUX_ERROR_READ;
+		rssconSetLastError(rsscon, RSSCON_ERROR_READ);
 		fprintf(stderr, "error read device.\n");
 		return false;
 	}
 
 	*readed = ret;
-	return true;
-}
-
-int rssconlinuxLastError(Rsscon* portdata) {
-#ifdef RSSCON_LOGING
-	printf("%d: rssconlinuxLastError...\n", __LINE__);
-#endif
-
-	RssconlinuxPortdata* data = (RssconlinuxPortdata*) portdata;
-	return data->lastError;
-}
-
-bool setupPortdata(RssconlinuxPortdata* portdata) {
-#ifdef RSSCON_LOGING
-	printf("%d: rssconlinuxSetupPortdata...\n", __LINE__);
-#endif
-	assert(portdata != NULL);
-
-	portdata->devicePath[0] = '\0';
-	portdata->lastError = RSSLINUX_ERROR_NOERROR;
-	if (portdata->tvsec < 0)
-		portdata->tvsec = 5;
-	if (portdata->tvusec < 1)
-		portdata->tvusec = portdata->tvsec * 10E6;
-	portdata->noblock = false;
-	portdata->wait = true;
-
 	return true;
 }
 
@@ -279,12 +314,11 @@ bool rssconSetupInterface(Rsscon* rsscon) {
 #endif
 	RssconlinuxPortdata portdata;
 	rsscon->portdata = &portdata;
-	setupPortdata(rsscon->portdata);
+	rsscon->rssconInit = rssconlinuxInit;
 	rsscon->rssconOpen = rssconlinuxOpen;
 	rsscon->rssconClose = rssconlinuxClose;
 	rsscon->rssconWrite = rssconlinuxWrite;
 	rsscon->rssconRead = rssconlinuxRead;
-	rsscon->rssconLastError = rssconlinuxLastError;
 	return true;
 }
 

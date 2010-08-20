@@ -18,6 +18,11 @@ typedef struct {
 	 */
 	unsigned int baudRate;
 
+	/**
+	 * Saves the last error.
+	 */
+	int lastError;
+
 } RssconPrivate;
 
 bool rssconInit(Rsscon* rsscon, const char* device, unsigned int baudRate) {
@@ -25,11 +30,12 @@ bool rssconInit(Rsscon* rsscon, const char* device, unsigned int baudRate) {
 	assert(rsscon->private == NULL);
 
 	RssconPrivate private = { 0 };
-	private.device = device;
-	private.baudRate = baudRate;
-
+private.device = device;
+private.baudRate = baudRate;
 	rsscon->private = &private;
-	return true;
+
+	assert(rsscon->rssconInit != NULL);
+	return rsscon->rssconInit(rsscon);
 }
 
 bool rssconOpen(Rsscon* rsscon) {
@@ -56,10 +62,18 @@ bool rssconRead(Rsscon* rsscon, void* data, size_t length, size_t* red) {
 	return rsscon->rssconRead(rsscon, data, length, red);
 }
 
-int rssconLastError(Rsscon* rsscon) {
+void rssconSetLastError(Rsscon* rsscon, int lastError) {
 	assert(rsscon != NULL);
-	assert(rsscon->rssconLastError != NULL);
-	return rsscon->rssconLastError(rsscon);
+	RssconPrivate* private = (RssconPrivate*) rsscon->private;
+	assert(private != NULL);
+private->lastError = lastError;
+}
+
+int rssconGetLastError(Rsscon* rsscon) {
+	assert(rsscon != NULL);
+	RssconPrivate* private = (RssconPrivate*) rsscon->private;
+	assert(private != NULL);
+	return private->lastError;
 }
 
 bool rssconIsOpen(Rsscon* rsscon) {
@@ -69,14 +83,14 @@ bool rssconIsOpen(Rsscon* rsscon) {
 	return private->open;
 }
 
-const char* rssconGetDevice(Rsscon* rsscon){
+const char* rssconGetDevice(Rsscon* rsscon) {
 	assert(rsscon != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
 	assert(private != NULL);
 	return private->device;
 }
 
-unsigned int rssconGetBaudRate(Rsscon* rsscon){
+unsigned int rssconGetBaudRate(Rsscon* rsscon) {
 	assert(rsscon != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
 	assert(private != NULL);

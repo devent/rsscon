@@ -11,7 +11,32 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#define RSSCON_BAUDRATE_57600 57600
+#define RSSCON_BAUDRATE_115200 115200
+#define RSSCON_BAUDRATE_230400 230400
+#define RSSCON_BAUDRATE_460800 460800
+#define RSSCON_BAUDRATE_500000 500000
+#define RSSCON_BAUDRATE_576000 576000
+#define RSSCON_BAUDRATE_921600 921600
+#define RSSCON_BAUDRATE_1000000 1000000
+#define RSSCON_BAUDRATE_1152000 1152000
+#define RSSCON_BAUDRATE_1500000 1500000
+#define RSSCON_BAUDRATE_2000000 2000000
+#define RSSCON_BAUDRATE_2500000 2500000
+#define RSSCON_BAUDRATE_3000000 3000000
+#define RSSCON_BAUDRATE_3500000 3500000
+#define RSSCON_BAUDRATE_4000000 4000000
+
+#define RSSCON_ERROR_NOERROR 0
+#define RSSCON_ERROR_OPENDEVICE -1
+#define RSSCON_ERROR_CLOSEDEVICE -2
+#define RSSCON_ERROR_SETUPDEVICE -3
+#define RSSCON_ERROR_WRITE -4
+#define RSSCON_ERROR_READ -5
+
 typedef struct Rsscon Rsscon;
+
+typedef bool (*RssconInit)(Rsscon*);
 
 typedef bool (*RssconOpen)(Rsscon*);
 
@@ -20,8 +45,6 @@ typedef bool (*RssconClose)(Rsscon*);
 typedef bool (*RssconWrite)(Rsscon*, const void*, size_t, size_t*);
 
 typedef bool (*RssconRead)(Rsscon*, void*, size_t, size_t*);
-
-typedef int (*RssconLastError)(Rsscon*);
 
 /**
  * Structure defines the public interface to rsscon.
@@ -38,6 +61,8 @@ struct Rsscon {
 	 */
 	void* private;
 
+	RssconInit rssconInit;
+
 	RssconOpen rssconOpen;
 
 	RssconClose rssconClose;
@@ -46,7 +71,6 @@ struct Rsscon {
 
 	RssconRead rssconRead;
 
-	RssconLastError rssconLastError;
 };
 
 /**
@@ -127,11 +151,19 @@ const char* rssconGetDevice(Rsscon* rsscon);
 unsigned int rssconGetBaudRate(Rsscon* rsscon);
 
 /**
+ * Sets the last error caused by accessing the port.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ * lastError: The last error.
+ */
+void rssconSetLastError(Rsscon* rsscon, int lastError);
+
+/**
  * Get the last error caused by accessing the port.
  *
  * rsscon: The public interface to the rsscon driver.
  * return: the code of the last error.
  */
-int rssconLastError(Rsscon* rsscon);
+int rssconGetLastError(Rsscon* rsscon);
 
 #endif /* RSSCON_H_ */

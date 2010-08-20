@@ -11,31 +11,25 @@ START_TEST (testRssconInit)
 		Rsscon rsscon = { 0 };
 		const char* device = "";
 		unsigned int baudRate = 0;
-		int ret = rssconInit(&rsscon, device, baudRate);
+		bool ret = rssconSetupInterface(&rsscon);
+		fail_unless(ret);
+		fail_unless(rsscon.portdata != NULL);
+		ret = rssconInit(&rsscon, device, baudRate);
 		fail_unless(ret);
 		fail_unless(rsscon.private != NULL);
-		fail_unless(rsscon.portdata == NULL);
-		fail_unless(rsscon.rssconOpen == NULL);
-		fail_unless(rsscon.rssconClose == NULL);
-		fail_unless(rsscon.rssconWrite == NULL);
-		fail_unless(rsscon.rssconRead == NULL);
-		fail_unless(rsscon.rssconLastError == NULL);
 	}END_TEST
 
 START_TEST (testRssconSetupInterface)
 	{
 		Rsscon rsscon = { 0 };
-		const char* device = "";
-		unsigned int baudRate = 0;
-		int ret = rssconInit(&rsscon, device, baudRate);
+		bool ret = rssconSetupInterface(&rsscon);
 		fail_unless(ret);
-		ret = rssconSetupInterface(&rsscon);
-		fail_unless(ret);
+		fail_unless(rsscon.portdata != NULL);
+		fail_unless(rsscon.rssconInit != NULL);
 		fail_unless(rsscon.rssconOpen != NULL);
 		fail_unless(rsscon.rssconClose != NULL);
 		fail_unless(rsscon.rssconWrite != NULL);
 		fail_unless(rsscon.rssconRead != NULL);
-		fail_unless(rsscon.rssconLastError != NULL);
 	}END_TEST
 
 START_TEST (testRssconOpenWithNotSetDevice)
@@ -43,13 +37,13 @@ START_TEST (testRssconOpenWithNotSetDevice)
 		Rsscon rsscon = { 0 };
 		const char* device = "";
 		unsigned int baudRate = 0;
-		int ret = rssconInit(&rsscon, device, baudRate);
+		bool ret = rssconSetupInterface(&rsscon);
 		fail_unless(ret);
-		ret = rssconSetupInterface(&rsscon);
+		ret = rssconInit(&rsscon, device, baudRate);
 		fail_unless(ret);
 		ret = rssconOpen(&rsscon);
 		fail_if(ret);
-		int lastError = rssconLastError(&rsscon);
+		int lastError = rssconGetLastError(&rsscon);
 #ifdef LINUX
 		fail_unless(lastError == RSSLINUX_ERROR_OPENDEVICE);
 #endif
@@ -59,10 +53,10 @@ START_TEST (testRssconOpen)
 	{
 		Rsscon rsscon = { 0 };
 		const char* device = "/dev/ttyUSB0";
-		unsigned int baudRate = 0;
-		int ret = rssconInit(&rsscon, device, baudRate);
+		unsigned int baudRate = RSSCON_BAUDRATE_921600;
+		bool ret = rssconSetupInterface(&rsscon);
 		fail_unless(ret);
-		ret = rssconSetupInterface(&rsscon);
+		ret = rssconInit(&rsscon, device, baudRate);
 		fail_unless(ret);
 		ret = rssconOpen(&rsscon);
 		fail_unless(ret);
@@ -72,8 +66,8 @@ START_TEST (testRssconOpen)
 
 Suite* addCoreTestCase(Suite* s) {
 	TCase *tc_core = tcase_create("core");
-	tcase_add_test (tc_core, testRssconInit);
 	tcase_add_test (tc_core, testRssconSetupInterface);
+	tcase_add_test (tc_core, testRssconInit);
 	tcase_add_test (tc_core, testRssconOpenWithNotSetDevice);
 	tcase_add_test (tc_core, testRssconOpen);
 	suite_add_tcase(s, tc_core);

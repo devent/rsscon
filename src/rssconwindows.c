@@ -315,7 +315,7 @@ bool rssconwindowsSetupInterface(NoiseRead* noiseread)
     noiseread->rssconClose = rssconwindowsClose;
     noiseread->rssconWrite = rssconwindowsWrite;
     noiseread->rssconRead = rssconwindowsRead;
-    noiseread->rssconLastError = rssconwindowsLastError;
+    noiseread->rssconGetLastError = rssconwindowsLastError;
 
     return true;
 }
