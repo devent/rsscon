@@ -6,15 +6,37 @@
 #include "rssconlinux.h"
 #endif
 
+START_TEST (testRssconInit)
+	{
+		Rsscon rsscon = { 0 };
+		int ret = rssconInit(&rsscon);
+		fail_unless(ret);
+		fail_unless(rsscon.private != NULL);
+		fail_unless(rsscon.portdata == NULL);
+		fail_unless(rsscon.rssconOpen == NULL);
+		fail_unless(rsscon.rssconClose == NULL);
+		fail_unless(rsscon.rssconWrite == NULL);
+		fail_unless(rsscon.rssconRead == NULL);
+		fail_unless(rsscon.rssconLastError == NULL);
+	}END_TEST
+
 START_TEST (testRssconSetupInterface)
 	{
 		Rsscon rsscon = { 0 };
-		int ret = rssconSetupInterface(&rsscon);
+		int ret = rssconInit(&rsscon);
 		fail_unless(ret);
+		ret = rssconSetupInterface(&rsscon);
+		fail_unless(ret);
+		fail_unless(rsscon.rssconOpen != NULL);
+		fail_unless(rsscon.rssconClose != NULL);
+		fail_unless(rsscon.rssconWrite != NULL);
+		fail_unless(rsscon.rssconRead != NULL);
+		fail_unless(rsscon.rssconLastError != NULL);
 	}END_TEST
 
 Suite* addCoreTestCase(Suite* s) {
 	TCase *tc_core = tcase_create("core");
+	tcase_add_test (tc_core, testRssconInit);
 	tcase_add_test (tc_core, testRssconSetupInterface);
 	suite_add_tcase(s, tc_core);
 	return s;
