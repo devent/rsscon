@@ -53,8 +53,10 @@ struct Rsscon {
  * Initialize the rsscon driver.
  *
  * rsscon: The public interface to the rsscon driver.
+ * device: The name of the device. Under Linux it's /dev/ttyUSB0.
+ * baudRate: The input and output baud rate of the device.
  */
-bool rssconInit(Rsscon* rsscon);
+bool rssconInit(Rsscon* rsscon, const char* device, unsigned int baudRate);
 
 /**
  * Setup the rsscon public interface.
@@ -109,6 +111,20 @@ bool rssconRead(Rsscon* rsscon, void* data, size_t length, size_t* red);
  * return: True when the port is open and ready to read/write, False otherwise.
  */
 bool rssconIsOpen(Rsscon* rsscon);
+
+/**
+ * Returns the device name that we read and write data to and from.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ */
+const char* rssconGetDevice(Rsscon* rsscon);
+
+/**
+ * Returns the input and output baud rate of the device.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ */
+unsigned int rssconGetBaudRate(Rsscon* rsscon);
 
 /**
  * Get the last error caused by accessing the port.

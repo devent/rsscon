@@ -8,13 +8,26 @@ typedef struct {
 	 */
 	bool open;
 
+	/**
+	 * The name of the device. Under Linux it's /dev/ttyUSB0.
+	 */
+	const char* device;
+
+	/**
+	 * The input and output baud rate of the device.
+	 */
+	unsigned int baudRate;
+
 } RssconPrivate;
 
-bool rssconInit(Rsscon* rsscon) {
+bool rssconInit(Rsscon* rsscon, const char* device, unsigned int baudRate) {
 	assert(rsscon != NULL);
 	assert(rsscon->private == NULL);
 
 	RssconPrivate private = { 0 };
+	private.device = device;
+	private.baudRate = baudRate;
+
 	rsscon->private = &private;
 	return true;
 }
@@ -54,4 +67,18 @@ bool rssconIsOpen(Rsscon* rsscon) {
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
 	assert(private != NULL);
 	return private->open;
+}
+
+const char* rssconGetDevice(Rsscon* rsscon){
+	assert(rsscon != NULL);
+	RssconPrivate* private = (RssconPrivate*) rsscon->private;
+	assert(private != NULL);
+	return private->device;
+}
+
+unsigned int rssconGetBaudRate(Rsscon* rsscon){
+	assert(rsscon != NULL);
+	RssconPrivate* private = (RssconPrivate*) rsscon->private;
+	assert(private != NULL);
+	return private->baudRate;
 }
