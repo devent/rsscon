@@ -78,8 +78,11 @@ Suite* createRssconSuite(void) {
 	return s;
 }
 
-int runSuite(Suite *s) {
+int runSuite(Suite *s, bool fork) {
 	SRunner *sr = srunner_create(s);
+	if (!fork) {
+		srunner_set_fork_status(sr, CK_NOFORK);
+	}
 	srunner_run_all(sr, CK_NORMAL);
 	int ret = srunner_ntests_failed(sr);
 	srunner_free(sr);
@@ -89,6 +92,6 @@ int runSuite(Suite *s) {
 
 int main() {
 	Suite *s = createRssconSuite();
-	int ret = runSuite(s);
+	int ret = runSuite(s, false);
 	return (ret == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
