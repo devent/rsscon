@@ -44,9 +44,7 @@ START_TEST (testRssconOpenWithNotSetDevice)
 		ret = rssconOpen(&rsscon);
 		fail_if(ret);
 		int lastError = rssconGetLastError(&rsscon);
-#ifdef LINUX
-		fail_unless(lastError == RSSLINUX_ERROR_OPENDEVICE);
-#endif
+		fail_unless(lastError == RSSCON_ERROR_OPENDEVICE);
 	}END_TEST
 
 START_TEST (testRssconOpen)
