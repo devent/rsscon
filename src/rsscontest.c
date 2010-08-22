@@ -108,6 +108,36 @@ START_TEST (testRssconOpenClose)
 
 	}END_TEST
 
+START_TEST (testRssconWrite)
+	{
+#ifdef LINUX
+		const char* device = "/dev/ttyUSB0";
+#endif
+		unsigned int baudrate = RSSCON_BAUDRATE_921600;
+		Rsscon* rsscon = rssconCreate(device, baudrate);
+		fail_if(rsscon == NULL);
+
+		bool ret = rssconInit(rsscon);
+		fail_unless(ret);
+
+		ret = rssconOpen(rsscon);
+		fail_unless(ret);
+
+		void* data = "i\r\n";
+		size_t length = 3;
+		size_t wrote;
+		ret = rssconWrite(rsscon, data, length, &wrote);
+		fail_unless(ret);
+		fail_unless(wrote == length);
+
+		ret = rssconClose(rsscon);
+		fail_unless(ret);
+
+		ret = rssconFree(rsscon);
+		fail_unless(ret);
+
+	}END_TEST
+
 Suite* addCoreTestCase(Suite* s) {
 	TCase *tc_core = tcase_create("core");
 	tcase_add_test (tc_core, testRssconCreateAndFree);
@@ -115,6 +145,7 @@ Suite* addCoreTestCase(Suite* s) {
 	tcase_add_test (tc_core, testRssconInit);
 	tcase_add_test (tc_core, testRssconOpenWithNoDevice);
 	tcase_add_test (tc_core, testRssconOpenClose);
+	tcase_add_test (tc_core, testRssconWrite);
 	suite_add_tcase(s, tc_core);
 	return s;
 }
@@ -139,6 +170,6 @@ int runSuite(Suite *s, bool fork) {
 
 int main() {
 	Suite *s = createRssconSuite();
-	int ret = runSuite(s, false);
+	int ret = runSuite(s, true);
 	return (ret == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
