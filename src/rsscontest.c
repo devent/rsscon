@@ -64,11 +64,55 @@ START_TEST (testRssconInit)
 
 	}END_TEST
 
+START_TEST (testRssconOpenWithNoDevice)
+	{
+		const char* device = "mydevice";
+		unsigned int baudrate = RSSCON_BAUDRATE_115200;
+		Rsscon* rsscon = rssconCreate(device, baudrate);
+		fail_if(rsscon == NULL);
+
+		bool ret = rssconInit(rsscon);
+		fail_unless(ret);
+
+		ret = rssconOpen(rsscon);
+		fail_if(ret);
+
+		int error = rssconGetLastError(rsscon);
+		fail_unless(error == RSSCON_ERROR_OPENDEVICE);
+
+		ret = rssconFree(rsscon);
+		fail_unless(ret);
+
+	}END_TEST
+
+START_TEST (testRssconOpenClose)
+	{
+		const char* device = "/dev/ttyUSB0";
+		unsigned int baudrate = RSSCON_BAUDRATE_115200;
+		Rsscon* rsscon = rssconCreate(device, baudrate);
+		fail_if(rsscon == NULL);
+
+		bool ret = rssconInit(rsscon);
+		fail_unless(ret);
+
+		ret = rssconOpen(rsscon);
+		fail_unless(ret);
+
+		ret = rssconClose(rsscon);
+		fail_unless(ret);
+
+		ret = rssconFree(rsscon);
+		fail_unless(ret);
+
+	}END_TEST
+
 Suite* addCoreTestCase(Suite* s) {
 	TCase *tc_core = tcase_create("core");
 	tcase_add_test (tc_core, testRssconCreateAndFree);
 	tcase_add_test (tc_core, testRssconCreateAndFreeAndProperties);
 	tcase_add_test (tc_core, testRssconInit);
+	tcase_add_test (tc_core, testRssconOpenWithNoDevice);
+	tcase_add_test (tc_core, testRssconOpenClose);
 	suite_add_tcase(s, tc_core);
 	return s;
 }

@@ -186,6 +186,7 @@ bool rssconlinuxOpen(Rsscon* rsscon) {
 #endif
 
 	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
 	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
 
 	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
