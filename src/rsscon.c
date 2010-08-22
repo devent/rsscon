@@ -71,7 +71,6 @@ bool rssconFree(Rsscon* rsscon) {
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
 	free(private);
 	free(rsscon);
-	rsscon = NULL;
 
 	return true;
 }

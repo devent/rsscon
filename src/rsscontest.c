@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <check.h>
+#include "CMemLeak.h"
 
 #include "rsscon.h"
 #ifdef LINUX
@@ -42,10 +43,32 @@ START_TEST (testRssconCreateAndFreeAndProperties)
 
 	}END_TEST
 
+START_TEST (testRssconInit)
+	{
+		const char* device = "mydevice";
+		unsigned int baudrate = 999;
+		Rsscon* rsscon = rssconCreate(device, baudrate);
+		fail_if(rsscon == NULL);
+
+		bool ret = rssconInit(rsscon);
+		fail_unless(ret);
+		fail_if(rsscon->rssconClose == NULL);
+		fail_if(rsscon->rssconFree == NULL);
+		fail_if(rsscon->rssconInit == NULL);
+		fail_if(rsscon->rssconOpen == NULL);
+		fail_if(rsscon->rssconRead == NULL);
+		fail_if(rsscon->rssconWrite == NULL);
+
+		ret = rssconFree(rsscon);
+		fail_unless(ret);
+
+	}END_TEST
+
 Suite* addCoreTestCase(Suite* s) {
 	TCase *tc_core = tcase_create("core");
 	tcase_add_test (tc_core, testRssconCreateAndFree);
 	tcase_add_test (tc_core, testRssconCreateAndFreeAndProperties);
+	tcase_add_test (tc_core, testRssconInit);
 	suite_add_tcase(s, tc_core);
 	return s;
 }
