@@ -38,6 +38,8 @@ typedef struct Rsscon Rsscon;
 
 typedef bool (*RssconInit)(Rsscon*);
 
+typedef bool (*RssconFree)(Rsscon*);
+
 typedef bool (*RssconOpen)(Rsscon*);
 
 typedef bool (*RssconClose)(Rsscon*);
@@ -63,6 +65,8 @@ struct Rsscon {
 
 	RssconInit rssconInit;
 
+	RssconFree rssconFree;
+
 	RssconOpen rssconOpen;
 
 	RssconClose rssconClose;
@@ -74,20 +78,27 @@ struct Rsscon {
 };
 
 /**
- * Initialize the rsscon driver.
+ * Create the rsscon driver.
  *
- * rsscon: The public interface to the rsscon driver.
  * device: The name of the device. Under Linux it's /dev/ttyUSB0.
  * baudRate: The input and output baud rate of the device.
+ * return: the public interface of the rsscon driver.
  */
-bool rssconInit(Rsscon* rsscon, const char* device, unsigned int baudRate);
+Rsscon* rssconCreate(const char* device, unsigned int baudRate);
 
 /**
- * Setup the rsscon public interface.
+ * Frees the allocated memory of the rsscon driver.
  *
  * rsscon: The public interface to the rsscon driver.
  */
-bool rssconSetupInterface(Rsscon* rsscon);
+bool rssconFree(Rsscon* rsscon);
+
+/**
+ * Setup the rsscon driver.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ */
+bool rssconInit(Rsscon* rsscon);
 
 /**
  * Opens the port for read and write access.

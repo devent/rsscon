@@ -113,6 +113,13 @@ speed_t translateBaudRate(unsigned int baudrate) {
 	}
 }
 
+bool rssconlinuxFree(Rsscon* rsscon) {
+	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
+	free(rsscon->portdata);
+	return true;
+}
+
 bool rssconlinuxInit(Rsscon* rsscon) {
 #ifdef RSSCON_LOGING
 	printf("%d: rssconlinuxInit...\n", __LINE__);
@@ -308,18 +315,20 @@ bool rssconlinuxRead(Rsscon* rsscon, void* data, size_t length, size_t* readed) 
 	return true;
 }
 
-bool rssconSetupInterface(Rsscon* rsscon) {
+bool rssconInit(Rsscon* rsscon) {
 #ifdef RSSCON_LOGING
 	printf("%d: rssconlinuxSetupInterface...\n", __LINE__);
 #endif
-	RssconlinuxPortdata portdata;
-	rsscon->portdata = &portdata;
+	RssconlinuxPortdata* portdata = malloc(sizeof(RssconlinuxPortdata));
+	rsscon->portdata = portdata;
 	rsscon->rssconInit = rssconlinuxInit;
+	rsscon->rssconFree = rssconlinuxFree;
 	rsscon->rssconOpen = rssconlinuxOpen;
 	rsscon->rssconClose = rssconlinuxClose;
 	rsscon->rssconWrite = rssconlinuxWrite;
 	rsscon->rssconRead = rssconlinuxRead;
-	return true;
+
+	return rsscon->rssconInit(rsscon);
 }
 
 #endif

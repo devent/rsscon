@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <string.h>
 #include "rsscon.h"
 
 typedef struct {
@@ -25,17 +26,54 @@ typedef struct {
 
 } RssconPrivate;
 
-bool rssconInit(Rsscon* rsscon, const char* device, unsigned int baudRate) {
+Rsscon* rssconCreate(const char* device, unsigned int baudRate) {
+	Rsscon* rsscon = malloc(sizeof(Rsscon));
+	if (rsscon == NULL) {
+		return NULL;
+	}
+
+	RssconPrivate* private = malloc(sizeof(RssconPrivate));
+	if (private == NULL) {
+		return NULL;
+	}
+
+	rsscon->rssconClose = NULL;
+	rsscon->rssconFree = NULL;
+	rsscon->rssconInit = NULL;
+	rsscon->rssconOpen = NULL;
+	rsscon->rssconRead = NULL;
+	rsscon->rssconWrite = NULL;
+
+	rsscon->private = private;
+	private->device = device;
+	private->baudRate = baudRate;
+	private->open = false;
+	private->lastError = RSSCON_ERROR_NOERROR;
+
+	return rsscon;
+}
+
+bool freeChildIfChildWasSet(Rsscon* rsscon) {
+	if (rsscon->rssconFree != NULL) {
+		return rsscon->rssconFree(rsscon);
+	}
+	return true;
+}
+
+bool rssconFree(Rsscon* rsscon) {
 	assert(rsscon != NULL);
-	assert(rsscon->private == NULL);
+	assert(rsscon->private != NULL);
 
-	RssconPrivate private = { 0 };
-private.device = device;
-private.baudRate = baudRate;
-	rsscon->private = &private;
+	if (!freeChildIfChildWasSet(rsscon)) {
+		return false;
+	}
 
-	assert(rsscon->rssconInit != NULL);
-	return rsscon->rssconInit(rsscon);
+	RssconPrivate* private = (RssconPrivate*) rsscon->private;
+	free(private);
+	free(rsscon);
+	rsscon = NULL;
+
+	return true;
 }
 
 bool rssconOpen(Rsscon* rsscon) {
@@ -64,35 +102,35 @@ bool rssconRead(Rsscon* rsscon, void* data, size_t length, size_t* red) {
 
 void rssconSetLastError(Rsscon* rsscon, int lastError) {
 	assert(rsscon != NULL);
+	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
-	assert(private != NULL);
 private->lastError = lastError;
 }
 
 int rssconGetLastError(Rsscon* rsscon) {
 	assert(rsscon != NULL);
+	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
-	assert(private != NULL);
 	return private->lastError;
 }
 
 bool rssconIsOpen(Rsscon* rsscon) {
 	assert(rsscon != NULL);
+	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
-	assert(private != NULL);
 	return private->open;
 }
 
 const char* rssconGetDevice(Rsscon* rsscon) {
 	assert(rsscon != NULL);
+	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
-	assert(private != NULL);
 	return private->device;
 }
 
 unsigned int rssconGetBaudRate(Rsscon* rsscon) {
 	assert(rsscon != NULL);
+	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
-	assert(private != NULL);
 	return private->baudRate;
 }
