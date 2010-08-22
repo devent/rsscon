@@ -87,7 +87,9 @@ START_TEST (testRssconOpenWithNoDevice)
 
 START_TEST (testRssconOpenClose)
 	{
+#ifdef LINUX
 		const char* device = "/dev/ttyUSB0";
+#endif
 		unsigned int baudrate = RSSCON_BAUDRATE_115200;
 		Rsscon* rsscon = rssconCreate(device, baudrate);
 		fail_if(rsscon == NULL);
