@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <string.h>
 #include "rsscon.h"
+#include "logger.h"
 
 typedef struct {
 
@@ -26,12 +27,19 @@ typedef struct {
 
 } RssconPrivate;
 
+#define LOG_CATEGORY "com.globalscalingsoftware.rsscon"
+
 Rsscon* rssconCreate(const char* device, unsigned int baudRate) {
+	log4c_category_t *log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconCreate('%s', %d)", device, baudRate);
+
+	log_debug(log, "allocate rsscon data structure...");
 	Rsscon* rsscon = malloc(sizeof(Rsscon));
 	if (rsscon == NULL) {
 		return NULL;
 	}
 
+	log_debug(log, "allocate rsscon private data structure...");
 	RssconPrivate* private = malloc(sizeof(RssconPrivate));
 	if (private == NULL) {
 		return NULL;
@@ -44,12 +52,15 @@ Rsscon* rssconCreate(const char* device, unsigned int baudRate) {
 	rsscon->rssconRead = NULL;
 	rsscon->rssconWrite = NULL;
 
+	rsscon->portdata = NULL;
 	rsscon->private = private;
 	private->device = device;
 	private->baudRate = baudRate;
 	private->open = false;
 	private->lastError = RSSCON_ERROR_NOERROR;
 
+	log_leave(log, "leave rssconCreate:=%d", rsscon);
+	free_log();
 	return rsscon;
 }
 
