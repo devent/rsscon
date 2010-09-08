@@ -1206,6 +1206,7 @@
 								<option id="gnu.c.link.option.paths.1140939725" name="Library search path (-L)" superClass="gnu.c.link.option.paths"/>
 								<option id="gnu.c.link.option.libs.595136511" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="check"/>
+									<listOptionValue builtIn="false" value="log4c"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1182651067" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

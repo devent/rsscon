@@ -72,45 +72,66 @@ bool freeChildIfChildWasSet(Rsscon* rsscon) {
 }
 
 bool rssconFree(Rsscon* rsscon) {
+	log4c_category_t *log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconFree(%d)", rsscon);
+
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);
 
 	if (!freeChildIfChildWasSet(rsscon)) {
+		log_leave(log, "leave rssconFree:=%d", false);
 		return false;
 	}
 
+	log_debug(log, "free private and rsscon structure...");
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
 	free(private);
 	free(rsscon);
 
+	log_leave(log, "leave rssconFree:=%d", true);
 	return true;
 }
 
 bool rssconOpen(Rsscon* rsscon) {
+	log4c_category_t *log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconOpen(%d)", rsscon);
+
 	assert(rsscon != NULL);
 	assert(rsscon->rssconOpen != NULL);
 	return rsscon->rssconOpen(rsscon);
 }
 
 bool rssconClose(Rsscon* rsscon) {
+	log4c_category_t *log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconClose(%d)", rsscon);
+
 	assert(rsscon != NULL);
 	assert(rsscon->rssconClose != NULL);
 	return rsscon->rssconClose(rsscon);
 }
 
 bool rssconWrite(Rsscon* rsscon, const void* data, size_t length, size_t* wrote) {
+	log4c_category_t *log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconWrite(%d, '%s', %d, %d)", rsscon, data, length, wrote);
+
 	assert(rsscon != NULL);
 	assert(rsscon->rssconWrite != NULL);
 	return rsscon->rssconWrite(rsscon, data, length, wrote);
 }
 
 bool rssconRead(Rsscon* rsscon, void* data, size_t length, size_t* red) {
+	log4c_category_t *log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconRead(%d, '%s', %d, %d)", rsscon, data, length, red);
+
 	assert(rsscon != NULL);
 	assert(rsscon->rssconRead != NULL);
 	return rsscon->rssconRead(rsscon, data, length, red);
 }
 
 void rssconSetLastError(Rsscon* rsscon, int lastError) {
+	log4c_category_t *log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconSetLastError(%d)", rsscon);
+
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
@@ -118,6 +139,9 @@ private->lastError = lastError;
 }
 
 int rssconGetLastError(Rsscon* rsscon) {
+	log4c_category_t *log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconGetLastError(%d)", rsscon);
+
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
@@ -125,6 +149,9 @@ int rssconGetLastError(Rsscon* rsscon) {
 }
 
 bool rssconIsOpen(Rsscon* rsscon) {
+	log4c_category_t *log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconIsOpen(%d)", rsscon);
+
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
@@ -132,6 +159,9 @@ bool rssconIsOpen(Rsscon* rsscon) {
 }
 
 const char* rssconGetDevice(Rsscon* rsscon) {
+	log4c_category_t *log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconGetDevice(%d)", rsscon);
+
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
@@ -139,6 +169,9 @@ const char* rssconGetDevice(Rsscon* rsscon) {
 }
 
 unsigned int rssconGetBaudRate(Rsscon* rsscon) {
+	log4c_category_t *log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconGetBaudRate(%d)", rsscon);
+
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
