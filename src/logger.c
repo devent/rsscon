@@ -1,14 +1,25 @@
 #include "logger.h"
 #include <stdarg.h>
 #include <log4c.h>
+#include <stdbool.h>
+
+static int log4c_init_counter = 0;
 
 log4c_category_t *get_log(const char* name) {
-	log4c_init();
+	if (log4c_init_counter == 0) {
+		log4c_init();
+		log4c_init_counter++;
+	}
 	return log4c_category_get(name);
 }
 
 int free_log() {
-	return log4c_fini();
+	if (log4c_init_counter == 0) {
+		return log4c_fini();
+	} else {
+		log4c_init_counter--;
+		return true;
+	}
 }
 
 void log_vdebug(const log4c_category_t *category, const char* format, va_list args){
