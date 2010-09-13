@@ -12,6 +12,9 @@
 #include <string.h>
 #include "rsscon.h"
 #include "rssconlinux.h"
+#include "logger.h"
+
+#define LOG_CATEGORY "com.globalscalingsoftware.rsscon"
 
 typedef struct {
 
@@ -181,14 +184,14 @@ bool setup(Rsscon* rsscon) {
 }
 
 bool rssconlinuxOpen(Rsscon* rsscon) {
-#ifdef RSSCON_LOGING
-	printf("%d: rssconlinuxOpen...\n", __LINE__);
-#endif
+	log4c_category_t *log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconlinuxOpen(%d)", rsscon);
 
 	assert(rsscon != NULL);
 	assert(rsscon->portdata != NULL);
 	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
 
+	log_debug(log, "reset last error...");
 	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
 
 	int flag = O_RDWR | O_NOCTTY;
@@ -197,20 +200,31 @@ bool rssconlinuxOpen(Rsscon* rsscon) {
 	}
 
 	const char* device = rssconGetDevice(rsscon);
+
+	log_debug(log, "open device '%s' with flag '%d'...", device, flag);
 	pdata->fd = open(device, flag);
 	if (pdata->fd == -1) {
 		fprintf(stderr, "error open device: %s\n", strerrno(errno));
 		rssconSetLastError(rsscon, RSSCON_ERROR_OPENDEVICE);
+
+		log_leave(log, "leave rssconCreate:=false");
+		free_log();
 		return false;
 	}
 
+	log_debug(log, "setup device...", device, flag);
 	bool ret = setup(rsscon);
 	if (!ret) {
 		fprintf(stderr, "error setup device.\n");
 		rssconSetLastError(rsscon, RSSCON_ERROR_OPENDEVICE);
+
+		log_leave(log, "leave rssconCreate:=false");
+		free_log();
 		return false;
 	}
 
+	log_leave(log, "leave rssconCreate:=true");
+	free_log();
 	return true;
 }
 
