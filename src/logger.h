@@ -31,11 +31,12 @@ void log_enter(const log4c_category_t *category, const char* name, ...) {
 	va_end(va);
 }
 
-void log_leave(const log4c_category_t *category, const char* name,
-		const void* ret) {
-	log_debug(category, name, ret);
+void log_leave(const log4c_category_t *category, const char* name, ...) {
+	va_list va;
+	va_start(va, name);
+	log_debug(category, name, va);
+	va_end(va);
 }
-
 
 
 #endif /* LOGGER_H_ */

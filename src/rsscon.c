@@ -88,7 +88,7 @@ bool rssconFree(Rsscon* rsscon) {
 	free(private);
 	free(rsscon);
 
-	log_leave(log, "leave rssconFree:=%d", true);
+	log_leave(log, "leave rssconFree:=true");
 	return true;
 }
 
