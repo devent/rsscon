@@ -15,7 +15,8 @@ log4c_category_t *get_log(const char* name) {
 
 int free_log() {
 	if (log4c_init_counter == 0) {
-		return log4c_fini();
+		int ret = log4c_fini();
+		return ret == 0 ? true : false;
 	} else {
 		log4c_init_counter--;
 		return true;
