@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "rsscon.h"
 #ifdef LINUX
@@ -44,60 +45,59 @@ void cleanupUnless(bool expression, Rsscon* rsscon) {
 	printRssconError(rsscon);
 }
 
-bool readInfo(Rsscon* rsscon) {
-	char* data = "i\r\n";
-	size_t length = 3;
-	size_t wrote;
-	bool ret = rssconWrite(rsscon, data, length, &wrote);
-	if (!ret) {
-		return false;
-	}
-
-	char* reddata = malloc(sizeof(char) * 255);
-	size_t redlength = 8;
+bool readDataToMax(Rsscon* rsscon, size_t max) {
+	char reddata;
+	size_t redlength = 1;
 	size_t red;
-	while (red >= redlength) {
-		ret = rssconRead(rsscon, reddata, redlength, &red);
-		printErrorUnless(ret, "rsscon close.");
+	size_t count = 0;
+
+	while (count < max) {
+		count++;
+		bool ret = rssconRead(rsscon, &reddata, redlength, &red);
+		printErrorUnless(ret, "rsscon read.");
 		printRssconError(rsscon);
 		if (!ret) {
 			break;
 		}
-		printf("%s", reddata);
+		printf("%s", &reddata);
 	}
 
-	free(reddata);
+	return true;
+}
+
+bool writeCommand(Rsscon* rsscon, const char* command) {
+	size_t length = strlen(command);
+	size_t wrote;
+	bool ret = rssconWrite(rsscon, command, length, &wrote);
+	return ret;
+}
+
+bool readInfo(Rsscon* rsscon) {
+	bool ret = writeCommand(rsscon, "i\r\n");
+	if (!ret) {
+		return false;
+	}
+
+	ret = readDataToMax(rsscon, 63);
+	if (!ret) {
+		return false;
+	}
+
 	return true;
 }
 
 bool readData(Rsscon* rsscon) {
-	char* data = "g\r\n";
-	size_t length = 3;
-	size_t wrote;
-	bool ret = rssconWrite(rsscon, data, length, &wrote);
+	bool ret = writeCommand(rsscon, "g\r\n");
 	if (!ret) {
 		return false;
 	}
 
-	char* reddata = malloc(sizeof(char) * 255);
-	size_t redlength = 8;
-	size_t red;
-	while (red >= redlength) {
-		ret = rssconRead(rsscon, reddata, redlength, &red);
-		printErrorUnless(ret, "rsscon close.");
-		printRssconError(rsscon);
-		if (!ret) {
-			break;
-		}
-		printf("%s", reddata);
+	ret = readDataToMax(rsscon, 63);
+	if (!ret) {
+		return false;
 	}
 
-	free(reddata);
-
-	data = "s\r\n";
-	length = 3;
-	wrote;
-	ret = rssconWrite(rsscon, data, length, &wrote);
+	ret = writeCommand(rsscon, "s\r\n");
 	if (!ret) {
 		return false;
 	}
