@@ -70,6 +70,41 @@ bool readInfo(Rsscon* rsscon) {
 	return true;
 }
 
+bool readData(Rsscon* rsscon) {
+	char* data = "g\r\n";
+	size_t length = 3;
+	size_t wrote;
+	bool ret = rssconWrite(rsscon, data, length, &wrote);
+	if (!ret) {
+		return false;
+	}
+
+	char* reddata = malloc(sizeof(char) * 255);
+	size_t redlength = 8;
+	size_t red;
+	while (red >= redlength) {
+		ret = rssconRead(rsscon, reddata, redlength, &red);
+		printErrorUnless(ret, "rsscon close.");
+		printRssconError(rsscon);
+		if (!ret) {
+			break;
+		}
+		printf("%s", reddata);
+	}
+
+	free(reddata);
+
+	data = "s\r\n";
+	length = 3;
+	wrote;
+	ret = rssconWrite(rsscon, data, length, &wrote);
+	if (!ret) {
+		return false;
+	}
+
+	return true;
+}
+
 int main() {
 #ifdef LINUX
 	const char* device = "/dev/ttyUSB0";
@@ -92,6 +127,11 @@ int main() {
 
 	ret = readInfo(rsscon);
 	printErrorUnless(ret, "read info.");
+	printRssconError(rsscon);
+	cleanupUnless(ret, rsscon);
+
+	ret = readData(rsscon);
+	printErrorUnless(ret, "read data.");
 	printRssconError(rsscon);
 	cleanupUnless(ret, rsscon);
 
