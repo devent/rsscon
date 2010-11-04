@@ -1,3 +1,10 @@
+/**
+ * Copyright 2010 Erwin Mueller, <erwin.mueller@deventm.org>
+ * Version 1.0
+ *
+ * A test suite to test the rsscon driver with the help of the check
+ * framework.
+ */
 #include <stdlib.h>
 #include <check.h>
 #include "CMemLeak.h"

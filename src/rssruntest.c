@@ -1,3 +1,9 @@
+/**
+ * Copyright 2010 Erwin Mueller, <erwin.mueller@deventm.org>
+ * Version 1.0
+ *
+ * A system test for the rsscon driver.
+ */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

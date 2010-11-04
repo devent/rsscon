@@ -1,10 +1,15 @@
-/*
- * rsscon.h
+/**
+ * Copyright 2010 Erwin Mueller, <erwin.mueller@deventm.org>
+ * Version 1.0
  *
- *  Created on: Aug 19, 2010
- *      Author: devent
+ * This is the rsscon driver API. The purpose is to open a port, read and write
+ * data to the port and close it. The API is designed to abstract the system
+ * and can be used with a Linux or Windows implementation.
+ *
+ * The C header file of the implementation is included and the function
+ * rssconInit() setup the private implementation for the system. For an
+ * example, see rsscontest.c and rssruntest.c.
  */
-
 #ifndef RSSCON_H_
 #define RSSCON_H_
 

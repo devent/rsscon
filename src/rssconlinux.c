@@ -1,3 +1,7 @@
+/**
+ * Copyright 2010 Erwin Mueller, <erwin.mueller@deventm.org>
+ * Version 1.0
+ */
 #ifdef LINUX
 
 #include <stdbool.h>

@@ -1,3 +1,9 @@
+/**
+ * Copyright 2010 Erwin Mueller, <erwin.mueller@deventm.org>
+ * Version 1.0
+ *
+ * The Windows implementation of the rsscon driver. Not tested and not working.
+ */
 #ifndef RSSCON_H
 #define RSSCON_H
 

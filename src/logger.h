@@ -1,3 +1,9 @@
+/**
+ * Copyright 2010 Erwin Mueller, <erwin.mueller@deventm.org>
+ * Version 1.0
+ *
+ * Defines wrapper functions for using with log4c.
+ */
 #ifndef LOGGER_H_
 #define LOGGER_H_
 
