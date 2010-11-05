@@ -73,7 +73,7 @@ Rsscon* rssconCreate(const char* device, unsigned int baudRate) {
 
 	rsscon->portdata = NULL;
 	rsscon->private = private;
-	strncpy(private->device, device, strlen(device));
+	strncpy(private->device, device, strlen(device) + 1);
 	private->baudRate = baudRate;
 	private->open = false;
 	private->lastError = RSSCON_ERROR_NOERROR;
