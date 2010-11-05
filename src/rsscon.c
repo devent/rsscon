@@ -32,7 +32,7 @@ typedef struct {
 	/**
 	 * The name of the device. Under Linux it's /dev/ttyUSB0.
 	 */
-	const char* device;
+	char device[256];
 
 	/**
 	 * The input and output baud rate of the device.
@@ -73,7 +73,7 @@ Rsscon* rssconCreate(const char* device, unsigned int baudRate) {
 
 	rsscon->portdata = NULL;
 	rsscon->private = private;
-	private->device = device;
+	strncpy(private->device, device, strlen(device));
 	private->baudRate = baudRate;
 	private->open = false;
 	private->lastError = RSSCON_ERROR_NOERROR;
