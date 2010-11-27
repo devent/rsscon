@@ -146,10 +146,10 @@ int main() {
 	printRssconError(rsscon);
 	cleanupUnless(ret, rsscon);
 
-	ret = readInfo(rsscon);
-	printErrorUnless(ret, "read info.");
-	printRssconError(rsscon);
-	cleanupUnless(ret, rsscon);
+	//ret = readInfo(rsscon);
+	//printErrorUnless(ret, "read info.");
+	//printRssconError(rsscon);
+	//cleanupUnless(ret, rsscon);
 
 	ret = readData(rsscon);
 	printErrorUnless(ret, "read data.");

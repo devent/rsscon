@@ -158,7 +158,7 @@ bool rssconlinuxInit(Rsscon* rsscon) {
 		pdata->tvusec = pdata->tvsec * 10E6;
 	}
 	pdata->noblock = false;
-	pdata->wait = true;
+	pdata->wait = false;
 
 	return true;
 }
