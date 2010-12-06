@@ -203,7 +203,7 @@ bool setup(Rsscon* rsscon) {
 }
 
 bool rssconlinuxOpen(Rsscon* rsscon) {
-	log4c_category_t *log = get_log(LOG_CATEGORY);
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
 	log_enter(log, "rssconlinuxOpen(%d)", rsscon);
 
 	assert(rsscon != NULL);

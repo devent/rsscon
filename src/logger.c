@@ -19,12 +19,14 @@
  */
 #include "logger.h"
 #include <stdarg.h>
-#include <log4c.h>
 #include <stdbool.h>
+#include <stdlib.h>
+
+#ifndef NO_LOG
 
 static int log4c_init_counter = 0;
 
-log4c_category_t *get_log(const char* name) {
+LOG4C_CATEGORY get_log(const char* name) {
 	if (log4c_init_counter == 0) {
 		log4c_init();
 		log4c_init_counter++;
@@ -42,29 +44,51 @@ int free_log() {
 	}
 }
 
-void log_vdebug(const log4c_category_t *category, const char* format, va_list args){
+void log_vdebug(const LOG4C_CATEGORY category, const char* format, va_list args){
 	log4c_category_vlog(category, LOG4C_PRIORITY_DEBUG, format, args);
 }
 
-void log_debug(const log4c_category_t *category, const char* format, ...) {
+void log_debug(const LOG4C_CATEGORY category, const char* format, ...) {
 	va_list va;
 	va_start(va, format);
 	log_vdebug(category, format, va);
 	va_end(va);
 }
 
-void log_enter(const log4c_category_t *category, const char* name, ...) {
+void log_enter(const LOG4C_CATEGORY category, const char* name, ...) {
 	va_list va;
 	va_start(va, name);
 	log_vdebug(category, name, va);
 	va_end(va);
 }
 
-void log_leave(const log4c_category_t *category, const char* name, ...) {
+void log_leave(const LOG4C_CATEGORY category, const char* name, ...) {
 	va_list va;
 	va_start(va, name);
 	log_debug(category, name, va);
 	va_end(va);
 }
 
+#else
 
+LOG4C_CATEGORY get_log(const char* name) {
+	return NULL;
+}
+
+int free_log() {
+	return true;
+}
+
+void log_vdebug(const LOG4C_CATEGORY category, const char* format, va_list args){
+}
+
+void log_debug(const LOG4C_CATEGORY category, const char* format, ...) {
+}
+
+void log_enter(const LOG4C_CATEGORY category, const char* name, ...) {
+}
+
+void log_leave(const LOG4C_CATEGORY category, const char* name, ...) {
+}
+
+#endif
