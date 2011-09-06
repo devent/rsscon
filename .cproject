@@ -393,9 +393,12 @@
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.228673677" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1591300449" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
-								<option id="gnu.c.link.option.paths.542591728" name="Library search path (-L)" superClass="gnu.c.link.option.paths"/>
+								<option id="gnu.c.link.option.paths.542591728" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="/usr/i686-pc-mingw32/sys-root/mingw/lib"/>
+								</option>
 								<option id="gnu.c.link.option.libs.73935860" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="check"/>
+									<listOptionValue builtIn="false" value="libcrtdll"/>
 									<listOptionValue builtIn="false" value="log4c"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1207938819" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
