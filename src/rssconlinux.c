@@ -139,6 +139,7 @@ bool rssconlinuxFree(Rsscon* rsscon) {
 	assert(rsscon != NULL);
 	assert(rsscon->portdata != NULL);
 	free(rsscon->portdata);
+	rsscon->portdata = NULL;
 	return true;
 }
 
