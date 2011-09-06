@@ -94,12 +94,12 @@ bool writeCommand(Rsscon* rsscon, const char* command) {
 }
 
 bool readInfo(Rsscon* rsscon) {
-	bool ret = writeCommand(rsscon, "i\r\n");
+	bool ret = writeCommand(rsscon, "i");
 	if (!ret) {
 		return false;
 	}
 
-	ret = readDataToMax(rsscon, 63);
+	ret = readDataToMax(rsscon, 96);
 	if (!ret) {
 		return false;
 	}
@@ -108,7 +108,7 @@ bool readInfo(Rsscon* rsscon) {
 }
 
 bool readData(Rsscon* rsscon) {
-	bool ret = writeCommand(rsscon, "g\r\n");
+	bool ret = writeCommand(rsscon, "g");
 	if (!ret) {
 		return false;
 	}
@@ -118,7 +118,7 @@ bool readData(Rsscon* rsscon) {
 		return false;
 	}
 
-	ret = writeCommand(rsscon, "s\r\n");
+	ret = writeCommand(rsscon, "s");
 	if (!ret) {
 		return false;
 	}
@@ -128,7 +128,7 @@ bool readData(Rsscon* rsscon) {
 
 int main() {
 #ifdef LINUX
-	const char* device = "/dev/ttyUSB0";
+	const char* device = "/dev/ttyUSB5";
 #endif
 	unsigned int baudrate = RSSCON_BAUDRATE_921600;
 	Rsscon* rsscon = rssconCreate(device, baudrate);
@@ -146,10 +146,10 @@ int main() {
 	printRssconError(rsscon);
 	cleanupUnless(ret, rsscon);
 
-	//ret = readInfo(rsscon);
-	//printErrorUnless(ret, "read info.");
-	//printRssconError(rsscon);
-	//cleanupUnless(ret, rsscon);
+//	ret = readInfo(rsscon);
+//	printErrorUnless(ret, "read info.");
+//	printRssconError(rsscon);
+//	cleanupUnless(ret, rsscon);
 
 	ret = readData(rsscon);
 	printErrorUnless(ret, "read data.");
