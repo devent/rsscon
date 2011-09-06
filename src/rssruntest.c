@@ -27,7 +27,7 @@
 #ifdef LINUX
 #include "rssconlinux.h"
 #endif
-#ifdef RSSCON_LINUX
+#ifdef RSSCON_WINDOWS
 #include "rssconwindows.h"
 #endif
 
@@ -132,6 +132,9 @@ bool readData(Rsscon* rsscon) {
 int main() {
 #ifdef LINUX
 	const char* device = "/dev/ttyUSB5";
+#endif
+#ifdef RSSCON_WINDOWS
+	const char* device = "COM:5";
 #endif
 	unsigned int baudrate = RSSCON_BAUDRATE_921600;
 	Rsscon* rsscon = rssconCreate(device, baudrate);
