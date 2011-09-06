@@ -29,6 +29,10 @@
 #include "rssconlinux.h"
 #endif
 
+#ifdef LINUX
+const char* device_path = "/dev/ttyUSB5";
+#endif
+
 START_TEST (testRssconCreateAndFree)
 	{
 		const char* device = "mydevice";
@@ -109,9 +113,7 @@ START_TEST (testRssconOpenWithNoDevice)
 
 START_TEST (testRssconOpenClose)
 	{
-#ifdef LINUX
-		const char* device = "/dev/ttyUSB0";
-#endif
+		const char* device = device_path;
 		unsigned int baudrate = RSSCON_BAUDRATE_921600;
 		Rsscon* rsscon = rssconCreate(device, baudrate);
 		fail_if(rsscon == NULL);
@@ -132,9 +134,7 @@ START_TEST (testRssconOpenClose)
 
 START_TEST (testRssconWrite)
 	{
-#ifdef LINUX
-		const char* device = "/dev/ttyUSB0";
-#endif
+		const char* device = device_path;
 		unsigned int baudrate = RSSCON_BAUDRATE_921600;
 		Rsscon* rsscon = rssconCreate(device, baudrate);
 		fail_if(rsscon == NULL);
@@ -162,9 +162,7 @@ START_TEST (testRssconWrite)
 
 START_TEST (testRssconWriteRead)
 	{
-#ifdef LINUX
-		const char* device = "/dev/ttyUSB0";
-#endif
+		const char* device = device_path;
 		unsigned int baudrate = RSSCON_BAUDRATE_921600;
 		Rsscon* rsscon = rssconCreate(device, baudrate);
 		fail_if(rsscon == NULL);
