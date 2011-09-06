@@ -50,7 +50,7 @@ typedef struct {
 	// the port handle.
 	HANDLE portHandle;
 
-	// the last error.
+	// the last error
 	DWORD lastError;
 }RssconwindowsPortdata;
 
@@ -105,6 +105,7 @@ bool rssconwindowsInit(Rsscon* rsscon) {
 }
 
 bool rssconwindowsOpen(Rsscon* rsscon) {
+	bool createFile(const char* device, RssconwindowsPortdata* pdata);
 	bool setCommConfiguration(const char*, RssconwindowsPortdata*, DCB*);
 	bool setCommState(const char*, RssconwindowsPortdata*, DCB*);
 	bool handshakeOff(RssconwindowsPortdata* portdata);
@@ -116,8 +117,46 @@ bool rssconwindowsOpen(Rsscon* rsscon) {
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
 	log_debug(log, "open windows device for rsscon %d.", rsscon);
 
+	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
+
 	const char* device = rssconGetDevice(rsscon);
 	log_debug(log, "create file for device %s.", device);
+	if (!createFile(device, pdata)) {
+		rssconSetLastError(rsscon, RSSCON_ERROR_OPENDEVICE);
+		return false;
+	}
+
+	DCB port = {0};
+	port.DCBlength = sizeof(DCB);
+
+	log_debug(log, "set comm configuration for device %s.", device);
+	if (!setCommConfiguration(device, pdata, &port)) {
+		rssconSetLastError(rsscon, RSSCON_ERROR_SETUPDEVICE);
+		return false;
+	}
+
+	log_debug(log, "set the comm state for the port handler %d.", pdata->portHandle);
+	if (!setCommState(device, pdata, &port)) {
+		rssconSetLastError(rsscon, RSSCON_ERROR_SETUPDEVICE);
+		return false;
+	}
+
+	log_debug(log, "set the handshake for the port handler %d.", pdata->portHandle);
+	if (!handshakeOff(pdata)) {
+		rssconSetLastError(rsscon, RSSCON_ERROR_SETUPDEVICE);
+		return false;
+	}
+
+	log_debug(log, "set the timeout blocking for the port handler %d.", pdata->portHandle);
+	if (!readTimeoutBlocking(pdata)) {
+		rssconSetLastError(rsscon, RSSCON_ERROR_SETUPDEVICE);
+		return false;
+	}
+
+	return true;
+}
+
+bool createFile(const char* device, RssconwindowsPortdata* pdata) {
 	pdata->portHandle = CreateFile(
 			device,
 			GENERIC_READ | GENERIC_WRITE, // Access Mode
@@ -126,30 +165,11 @@ bool rssconwindowsOpen(Rsscon* rsscon) {
 			OPEN_EXISTING,// How to open (must be OPEN_EXISTING)
 			0,// Port attributes (no overlapped IO)
 			NULL);// Must be NULL
-
-	DCB port = {0};
-	port.DCBlength = sizeof(DCB);
-
-	log_debug(log, "set comm configuration for device %s.", device);
-	if (!setCommConfiguration(device, pdata, &port)) {
+	if (pdata->portHandle == INVALID_HANDLE_VALUE) {
+		fputs("Failed to get comm state.\n", stderr);
+		pdata->lastError = GetLastError();
 		return false;
 	}
-
-	log_debug(log, "set the comm state for the port handler %d.", pdata->portHandle);
-	if (!setCommState(device, pdata, &port)) {
-		return false;
-	}
-
-	log_debug(log, "set the handshake for the port handler %d.", pdata->portHandle);
-	if (!handshakeOff(pdata)) {
-		return false;
-	}
-
-	log_debug(log, "set the timeout blocking for the port handler %d.", pdata->portHandle);
-	if (!readTimeoutBlocking(pdata)) {
-		return false;
-	}
-
 	return true;
 }
 
@@ -295,12 +315,15 @@ bool rssconwindowsRead(Rsscon* rsscon, void* data, size_t length, size_t* readed
 	assert(pdata != NULL);
 	assert(pdata->portHandle != INVALID_HANDLE_VALUE);
 
+	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
+
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
 	log_debug(log, "read data for rsscon %d of size %d.", rsscon, length);
 
 	DWORD r;
 	if (!ReadFile(pdata->portHandle, data, length, &r, NULL)) {
 		pdata->lastError = GetLastError();
+		rssconSetLastError(rsscon, RSSCON_ERROR_READ);
 		fprintf(stderr, "failed to read a byte from the port.\n");
 		return false;
 	}
@@ -329,11 +352,14 @@ bool rssconwindowsClose(Rsscon* rsscon) {
 	assert(pdata != NULL);
 	assert(pdata->portHandle != INVALID_HANDLE_VALUE);
 
+	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
+
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
 	log_debug(log, "close windows device for rsscon %d.", rsscon);
 
 	if (!CloseHandle(pdata->portHandle)) {
 		fputs("Failed to close the handle from port.\n", stderr);
+		rssconSetLastError(rsscon, RSSCON_ERROR_CLOSEDEVICE);
 		pdata->lastError = GetLastError();
 		return false;
 	}
@@ -347,12 +373,15 @@ bool rssconwindowsWrite(Rsscon* rsscon, const void* data, size_t length,
 	assert(pdata != NULL);
 	assert(pdata->portHandle != INVALID_HANDLE_VALUE);
 
+	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
+
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
 	log_debug(log, "write data for rsscon %d with size %d.", rsscon, length);
 
 	DWORD w;
 	if (!WriteFile(pdata->portHandle, data, length, &w, NULL)) {
 		fputs("rssconwindowsWrite: failed to write data to the port handler.\n", stderr);
+		rssconSetLastError(rsscon, RSSCON_ERROR_WRITE);
 		pdata->lastError = GetLastError();
 		return false;
 	}
