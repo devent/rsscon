@@ -27,6 +27,9 @@
 #ifdef LINUX
 #include "rssconlinux.h"
 #endif
+#ifdef RSSCON_LINUX
+#include "rssconwindows.h"
+#endif
 
 void printRssconError(const Rsscon* rsscon) {
 	int err = rssconGetLastError(rsscon);

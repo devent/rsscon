@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * rsscon. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifdef WINDOWS
+#ifdef RSSCON_WINDOWS
 
 #include <assert.h>
 #include <stdio.h>
@@ -26,17 +26,41 @@
 #include <windows.h>
 
 #include "rsscon.h"
+#include "rssconwindows.h"
+#include "logger.h"
 
-typedef struct
-{
-    DWORD readInterval;
-    DWORD readTotalMultiplier;
-    DWORD readTotalConstant;
-    DWORD writeTotalMultiplier;
-    DWORD writeTotalConstant;
-} Timeout;
+#define LOG_CATEGORY "com.globalscalingsoftware.rsscon.rssconwindows"
 
-bool handshakeOff(RssconwindowsPortdata* portdata);
+typedef struct {
+	// the baud rate, CBR_xxxxx (CBR_115200, ...).
+	DWORD baudRate;
+
+	// TRUE for parity, FALSE for no parity.
+	DWORD parityon;
+
+	// the parity, EVENTPARITY, MARKPARITY, NOPARITY, ODDPARITY, SPACEPARITY.
+	BYTE parity;
+
+	// the stop bits, ONESTOPBIT, ONESSTOPBITS, TWOSTOPBITS.
+	BYTE stopBits;
+
+	// the size of a byte.
+	BYTE byteSize;
+
+	// the port handle.
+	HANDLE portHandle;
+
+	// the last error.
+	DWORD lastError;
+}RssconwindowsPortdata;
+
+typedef struct {
+	DWORD readInterval;
+	DWORD readTotalMultiplier;
+	DWORD readTotalConstant;
+	DWORD writeTotalMultiplier;
+	DWORD writeTotalConstant;
+}Timeout;
 
 bool readTimeoutBlocking(RssconwindowsPortdata* portdata);
 
@@ -47,296 +71,312 @@ bool purge(RssconwindowsPortdata* portdata);
 // Sets timeouts for the port.
 bool timeouts(RssconwindowsPortdata* portdata, Timeout* timeout);
 
-// Set default settings to portdata.
-bool rssconwindowsSetupPortdata(RssconwindowsPortdata* pdata)
-{
-    assert(pdata != NULL);
+bool rssconwindowsFree(Rsscon* rsscon) {
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_debug(log, "free all windows data structures for rsscon %d.", rsscon);
 
-    pdata->portHandle = INVALID_HANDLE_VALUE;
+	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
+	free(rsscon->portdata);
+	rsscon->portdata = NULL;
+	return true;
+}
+
+bool rssconwindowsInit(Rsscon* rsscon) {
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_debug(log, "setup windows settings for rsscon %d.", rsscon);
+
+	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
+	RssconwindowsPortdata* pdata = (RssconwindowsPortdata*) rsscon->portdata;
+
+	pdata->portHandle = INVALID_HANDLE_VALUE;
 #ifndef NOISEREAD_3
-    pdata->baudRate = CBR_115200;
+	pdata->baudRate = CBR_115200;
 #endif
 #ifdef NOISEREAD_3
-    pdata->baudRate = 921600;
+	pdata->baudRate = 921600;
 #endif
-    pdata->parityon = FALSE;
-    pdata->parity = NOPARITY;
-    pdata->stopBits = ONESTOPBIT;
-    pdata->byteSize = 8;
-    return true;
+	pdata->parityon = FALSE;
+	pdata->parity = NOPARITY;
+	pdata->stopBits = ONESTOPBIT;
+	pdata->byteSize = 8;
+	return true;
 }
 
-bool rssconwindowsOpen(void* portdata)
-{
-    assert(portdata != NULL);
-    RssconwindowsPortdata* pdata = (RssconwindowsPortdata*)portdata;
-    assert(pdata != NULL);
+bool rssconwindowsOpen(Rsscon* rsscon) {
+	bool setCommConfiguration(const char*, RssconwindowsPortdata*, DCB*);
+	bool setCommState(const char*, RssconwindowsPortdata*, DCB*);
+	bool handshakeOff(RssconwindowsPortdata* portdata);
 
-#ifdef RSSCON_LOGING
-    printf("create the file for port '%s'...\n", pdata->portName);
-#endif
+	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
+	RssconwindowsPortdata* pdata = (RssconwindowsPortdata*) rsscon->portdata;
 
-    pdata->portHandle = CreateFile(
-        pdata->portName,
-        GENERIC_READ | GENERIC_WRITE,   // Access Mode
-        0,                              // Shared Mode (must be 0 = not shared)
-        NULL,                           // Security attributes
-        OPEN_EXISTING,                  // How to open (must be OPEN_EXISTING)
-        0,                              // Port attributes (no overlapped IO)
-        NULL);                          // Must be NULL
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_debug(log, "open windows device for rsscon %d.", rsscon);
 
-    DCB port = { 0 };
-    port.DCBlength = sizeof(DCB);
+	const char* device = rssconGetDevice(rsscon);
+	log_debug(log, "create file for device %s.", device);
+	pdata->portHandle = CreateFile(
+			device,
+			GENERIC_READ | GENERIC_WRITE, // Access Mode
+			0,// Shared Mode (must be 0 = not shared)
+			NULL,// Security attributes
+			OPEN_EXISTING,// How to open (must be OPEN_EXISTING)
+			0,// Port attributes (no overlapped IO)
+			NULL);// Must be NULL
 
-     COMMCONFIG commConfig = {0};
-    DWORD dwSize = sizeof(commConfig);
-    commConfig.dwSize = dwSize;
-    if ( GetDefaultCommConfig(pdata->portName, &commConfig, &dwSize) )
-    {
-        // Set the default communication configuration
-        if ( !SetCommConfig(pdata->portHandle, &commConfig, dwSize) )
-        {
-            fputs("Failed to set default port settings.\n", stderr);
-            pdata->lastError = GetLastError();
-            return false;
-        }
-    }
+	DCB port = {0};
+	port.DCBlength = sizeof(DCB);
 
+	log_debug(log, "set comm configuration for device %s.", device);
+	if (!setCommConfiguration(device, pdata, &port)) {
+		return false;
+	}
 
-    if ( !GetCommState(pdata->portHandle, &port) )
-    {
-        fputs("Failed to get port settings.\n", stderr);
-        pdata->lastError = GetLastError();
-        return false;
-    }
+	log_debug(log, "set the comm state for the port handler %d.", pdata->portHandle);
+	if (!setCommState(device, pdata, &port)) {
+		return false;
+	}
 
-    port.BaudRate = pdata->baudRate;
-    port.ByteSize = pdata->byteSize;
-    port.fParity = pdata->parityon;
-    port.Parity =  pdata->parity;
-    port.StopBits =  pdata->stopBits;
+	log_debug(log, "set the handshake for the port handler %d.", pdata->portHandle);
+	if (!handshakeOff(pdata)) {
+		return false;
+	}
 
-#ifdef RSSCON_LOGING
-    printf("trying to set the comm state for the port handler %d...\n", pdata->portHandle);
-#endif
+	log_debug(log, "set the timeout blocking for the port handler %d.", pdata->portHandle);
+	if (!readTimeoutBlocking(pdata)) {
+		return false;
+	}
 
-    if ( !SetCommState(pdata->portHandle, &port) )
-    {
-        fputs("Failed to set port settings.\n", stderr);
-        pdata->lastError = GetLastError();
-        return false;
-    }
-
-    bool ok = handshakeOff(pdata);
-    if (!ok) return false;
-    ok = readTimeoutBlocking(pdata);
-    if (!ok) return false;
-
-    return true;
+	return true;
 }
 
-bool handshakeOff(RssconwindowsPortdata* pdata)
-{
-    assert(pdata != NULL);
+bool setCommConfiguration(const char* device, RssconwindowsPortdata* pdata, DCB* port) {
+	COMMCONFIG commConfig = {0};
+	DWORD dwSize = sizeof(commConfig);
+	commConfig.dwSize = dwSize;
+	if (!GetDefaultCommConfig(device, &commConfig, &dwSize)) {
+		fputs("Failed to get default port settings.\n", stderr);
+		pdata->lastError = GetLastError();
+		return false;
+	}
+	if (!SetCommConfig(pdata->portHandle, &commConfig, dwSize)) {
+		fputs("Failed to set default port settings.\n", stderr);
+		pdata->lastError = GetLastError();
+		return false;
+	}
+	return true;
+}
 
-    DCB port = { 0 };
-    port.DCBlength = sizeof(DCB);
+bool setCommState(const char* device, RssconwindowsPortdata* pdata, DCB* port) {
+	if ( !GetCommState(pdata->portHandle, port) ) {
+		fputs("Failed to get comm state.\n", stderr);
+		pdata->lastError = GetLastError();
+		return false;
+	}
 
-    if ( !GetCommState(pdata->portHandle, &port) )
-    {
-        fputs("Failed to get port settings.\n", stderr);
-        pdata->lastError = GetLastError();
-        return false;
-    }
+	port->BaudRate = pdata->baudRate;
+	port->ByteSize = pdata->byteSize;
+	port->fParity = pdata->parityon;
+	port->Parity = pdata->parity;
+	port->StopBits = pdata->stopBits;
 
-        port.fOutxCtsFlow = 0;                    // Disable CTS monitoring
-        port.fOutxDsrFlow = 0;                    // Disable DSR monitoring
-        port.fDtrControl = DTR_CONTROL_DISABLE;        // Disable DTR monitoring
-        port.fOutX = 0;                            // Disable XON/XOFF for transmission
-        port.fInX = 0;                            // Disable XON/XOFF for receiving
-        port.fRtsControl = RTS_CONTROL_DISABLE;        // Disable RTS (Ready To Send)
+	if (!SetCommState(pdata->portHandle, port)) {
+		fputs("Failed to set port settings.\n", stderr);
+		pdata->lastError = GetLastError();
+		return false;
+	}
 
-    if ( !SetCommState(pdata->portHandle, &port) )
-    {
-        fputs("Failed to set port settings.\n", stderr);
-        pdata->lastError = GetLastError();
-        return false;
-    }
+	return true;
+}
 
-    return true;
+bool handshakeOff(RssconwindowsPortdata* pdata) {
+	assert(pdata != NULL);
+
+	DCB port = {0};
+	port.DCBlength = sizeof(DCB);
+
+	if (!GetCommState(pdata->portHandle, &port)) {
+		fputs("Failed to get port settings.\n", stderr);
+		pdata->lastError = GetLastError();
+		return false;
+	}
+
+	port.fOutxCtsFlow = 0; // Disable CTS monitoring
+	port.fOutxDsrFlow = 0;// Disable DSR monitoring
+	port.fDtrControl = DTR_CONTROL_DISABLE;// Disable DTR monitoring
+	port.fOutX = 0;// Disable XON/XOFF for transmission
+	port.fInX = 0;// Disable XON/XOFF for receiving
+	port.fRtsControl = RTS_CONTROL_DISABLE;// Disable RTS (Ready To Send)
+
+	if ( !SetCommState(pdata->portHandle, &port) )
+	{
+		fputs("Failed to set port settings.\n", stderr);
+		pdata->lastError = GetLastError();
+		return false;
+	}
+
+	return true;
 }
 
 bool readTimeoutBlocking(RssconwindowsPortdata* pdata)
 {
-    assert(pdata != NULL);
+	assert(pdata != NULL);
 
-    COMMTIMEOUTS cto;
-    if ( !GetCommTimeouts(pdata->portHandle, &cto) )
-    {
-        fputs("Failed to get port timeouts.\n", stderr);
-        pdata->lastError = GetLastError();
-        return false;
-    }
-        cto.ReadIntervalTimeout = 0;
-        cto.ReadTotalTimeoutConstant = 0;
-        cto.ReadTotalTimeoutMultiplier = 0;
-    if ( !SetCommTimeouts(pdata->portHandle, &cto) )
-    {
-        fputs("Failed to set port timeouts.\n", stderr);
-        pdata->lastError = GetLastError();
-        return false;
-    }
+	COMMTIMEOUTS cto;
+	if ( !GetCommTimeouts(pdata->portHandle, &cto) )
+	{
+		fputs("Failed to get port timeouts.\n", stderr);
+		pdata->lastError = GetLastError();
+		return false;
+	}
+	cto.ReadIntervalTimeout = 0;
+	cto.ReadTotalTimeoutConstant = 0;
+	cto.ReadTotalTimeoutMultiplier = 0;
+	if ( !SetCommTimeouts(pdata->portHandle, &cto) )
+	{
+		fputs("Failed to set port timeouts.\n", stderr);
+		pdata->lastError = GetLastError();
+		return false;
+	}
 
-    return true;
+	return true;
 }
 
 bool readTimeoutNonblocking(RssconwindowsPortdata* pdata)
 {
-    assert(pdata != NULL);
+	assert(pdata != NULL);
 
-    COMMTIMEOUTS cto;
-    if ( !GetCommTimeouts(pdata->portHandle, &cto) )
-    {
-        fputs("Failed to get port timeouts.\n", stderr);
-        pdata->lastError = GetLastError();
-        return false;
-    }
-        cto.ReadIntervalTimeout = MAXDWORD;
-        cto.ReadTotalTimeoutConstant = 0;
-        cto.ReadTotalTimeoutMultiplier = 0;
-    if ( !SetCommTimeouts(pdata->portHandle, &cto) )
-    {
-        fputs("Failed to set port timeouts.\n", stderr);
-        pdata->lastError = GetLastError();
-        return false;
-    }
+	COMMTIMEOUTS cto;
+	if (!GetCommTimeouts(pdata->portHandle, &cto)) {
+		fputs("Failed to get port timeouts.\n", stderr);
+		pdata->lastError = GetLastError();
+		return false;
+	}
+	cto.ReadIntervalTimeout = MAXDWORD;
+	cto.ReadTotalTimeoutConstant = 0;
+	cto.ReadTotalTimeoutMultiplier = 0;
+	if (!SetCommTimeouts(pdata->portHandle, &cto)) {
+		fputs("Failed to set port timeouts.\n", stderr);
+		pdata->lastError = GetLastError();
+		return false;
+	}
 
-    return true;
+	return true;
 }
 
 bool timeouts(RssconwindowsPortdata* portdata, Timeout* timeout)
 {
-    assert(portdata != NULL && timeout != NULL);
-    RssconwindowsPortdata* pdata = (RssconwindowsPortdata*)portdata;
-    assert(pdata != NULL);
+	assert(portdata != NULL && timeout != NULL);
+	RssconwindowsPortdata* pdata = (RssconwindowsPortdata*)portdata;
+	assert(pdata != NULL);
 
-    COMMTIMEOUTS timeouts = { 0 };
-    timeouts.ReadIntervalTimeout = timeout->readInterval;
-    timeouts.ReadTotalTimeoutMultiplier = timeout->readTotalMultiplier;
-    timeouts.ReadTotalTimeoutConstant = timeout->readTotalConstant;
-    timeouts.WriteTotalTimeoutMultiplier = timeout->writeTotalMultiplier;
-    timeouts.WriteTotalTimeoutConstant = timeout->writeTotalConstant;
+	COMMTIMEOUTS timeouts = {0};
+	timeouts.ReadIntervalTimeout = timeout->readInterval;
+	timeouts.ReadTotalTimeoutMultiplier = timeout->readTotalMultiplier;
+	timeouts.ReadTotalTimeoutConstant = timeout->readTotalConstant;
+	timeouts.WriteTotalTimeoutMultiplier = timeout->writeTotalMultiplier;
+	timeouts.WriteTotalTimeoutConstant = timeout->writeTotalConstant;
 
-    if ( !SetCommTimeouts(pdata->portHandle, &timeouts) )
-    {
-        fputs("Failed to set port timeout periods.\n", stderr);
-        pdata->lastError = GetLastError();
-        return true;
-    }
+	if (!SetCommTimeouts(pdata->portHandle, &timeouts)) {
+		fputs("Failed to set port timeout periods.\n", stderr);
+		pdata->lastError = GetLastError();
+		return true;
+	}
 
-    return false;
+	return false;
 }
 
-bool rssconwindowsRead(void* portdata, void* data, size_t length, size_t* read)
-{
-    assert(portdata != NULL);
-    RssconwindowsPortdata* pdata = (RssconwindowsPortdata*)portdata;
-    assert(pdata != NULL);
+bool rssconwindowsRead(Rsscon* rsscon, void* data, size_t length, size_t* readed) {
+	assert(rsscon != NULL);
+	RssconwindowsPortdata* pdata = (RssconwindowsPortdata*)rsscon->portdata;
+	assert(pdata != NULL);
+	assert(pdata->portHandle != INVALID_HANDLE_VALUE);
 
-    assert(portdata != NULL);
-    assert(data != NULL);
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_debug(log, "read data for rsscon %d of size %d.", rsscon, length);
 
-    DWORD r;
-    if ( !ReadFile(pdata->portHandle, data, length, &r, NULL) )
-    {
-        pdata->lastError = GetLastError();
-        fprintf(stderr, "failed to read a byte from the port.\n");
-        return false;
-    }
+	DWORD r;
+	if (!ReadFile(pdata->portHandle, data, length, &r, NULL)) {
+		pdata->lastError = GetLastError();
+		fprintf(stderr, "failed to read a byte from the port.\n");
+		return false;
+	}
 
-    *read = r;
-    return true;
+	*readed = r;
+	return true;
 }
 
 bool purge(RssconwindowsPortdata* pdata)
 {
-    assert(pdata != NULL);
+	assert(pdata != NULL);
 
-    if ( !PurgeComm(pdata->portHandle, PURGE_TXCLEAR | PURGE_RXCLEAR) )
-    {
-        pdata->lastError = GetLastError();
-        fprintf(stderr, "failed to purge the port.\n");
-        return false;
-    }
+	if ( !PurgeComm(pdata->portHandle, PURGE_TXCLEAR | PURGE_RXCLEAR) )
+	{
+		pdata->lastError = GetLastError();
+		fprintf(stderr, "failed to purge the port.\n");
+		return false;
+	}
 
-    return true;
+	return true;
 }
 
-bool rssconwindowsClose(void* portdata)
-{
-    assert(portdata != NULL);
-    RssconwindowsPortdata* pdata = (RssconwindowsPortdata*)portdata;
-    assert(pdata != NULL);
+bool rssconwindowsClose(Rsscon* rsscon) {
+	assert(rsscon != NULL);
+	RssconwindowsPortdata* pdata = (RssconwindowsPortdata*) rsscon->portdata;
+	assert(pdata != NULL);
+	assert(pdata->portHandle != INVALID_HANDLE_VALUE);
 
-    if ( pdata->portHandle != INVALID_HANDLE_VALUE )
-    {
-#ifdef RSSCON_LOGING
-        printf("closing the port handler %d...\n", pdata->portHandle);
-#endif
-        if ( !CloseHandle(pdata->portHandle) )
-        {
-            fputs("Failed to close the handle from port.\n", stderr);
-            pdata->lastError = GetLastError();
-            return false;
-        }
-    }
-    return true;
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_debug(log, "close windows device for rsscon %d.", rsscon);
+
+	if (!CloseHandle(pdata->portHandle)) {
+		fputs("Failed to close the handle from port.\n", stderr);
+		pdata->lastError = GetLastError();
+		return false;
+	}
+	return true;
 }
 
-bool rssconwindowsWrite(void* portdata, const void* data, size_t length, size_t* writed)
-{
-    assert(portdata != NULL);
-    RssconwindowsPortdata* pdata = (RssconwindowsPortdata*)portdata;
-    assert(pdata != NULL);
+bool rssconwindowsWrite(Rsscon* rsscon, const void* data, size_t length,
+		size_t* wrote) {
+	assert(rsscon != NULL);
+	RssconwindowsPortdata* pdata = (RssconwindowsPortdata*) rsscon->portdata;
+	assert(pdata != NULL);
+	assert(pdata->portHandle != INVALID_HANDLE_VALUE);
 
-#ifdef RSSCON_LOGING
-    printf("writing %d data to the port handler...\n", length);
-#endif
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_debug(log, "write data for rsscon %d with size %d.", rsscon, length);
 
-    DWORD w;
-    if ( !WriteFile(pdata->portHandle, data, length, &w, NULL) )
-    {
-        fputs("rssconwindowsWrite: failed to write data to the port handler.\n", stderr);
-        pdata->lastError = GetLastError();
-        return false;
-    }
+	DWORD w;
+	if (!WriteFile(pdata->portHandle, data, length, &w, NULL)) {
+		fputs("rssconwindowsWrite: failed to write data to the port handler.\n", stderr);
+		pdata->lastError = GetLastError();
+		return false;
+	}
 
-    *writed = w;
-    return true;
+	*wrote = w;
+	return true;
 }
 
-int rssconwindowsLastError(void* portdata)
-{
-    assert(portdata != NULL);
-    RssconwindowsPortdata* pdata = (RssconwindowsPortdata*)portdata;
-    assert(pdata != NULL);
+bool rssconInit(Rsscon* rsscon) {
+	assert(rsscon != NULL);
 
-    return pdata->lastError;
-}
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_debug(log, "setup windows interface for rsscon %d.", rsscon);
 
-bool rssconwindowsSetupInterface(NoiseRead* noiseread)
-{
-#ifdef RSSCON_LOGING
-    printf("%d: rssconwindowsSetupInterface...\n", __LINE__);
-#endif
+	RssconwindowsPortdata* portdata = malloc(sizeof(RssconwindowsPortdata));
+	rsscon->portdata = portdata;
+	rsscon->rssconInit = rssconwindowsInit;
+	rsscon->rssconFree = rssconwindowsFree;
+	rsscon->rssconOpen = rssconwindowsOpen;
+	rsscon->rssconClose = rssconwindowsClose;
+	rsscon->rssconWrite = rssconwindowsWrite;
+	rsscon->rssconRead = rssconwindowsRead;
 
-    noiseread->rssconOpen = rssconwindowsOpen;
-    noiseread->rssconClose = rssconwindowsClose;
-    noiseread->rssconWrite = rssconwindowsWrite;
-    noiseread->rssconRead = rssconwindowsRead;
-    noiseread->rssconGetLastError = rssconwindowsLastError;
-
-    return true;
+	return rsscon->rssconInit(rsscon);
 }
 
 #endif
