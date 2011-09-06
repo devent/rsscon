@@ -62,15 +62,6 @@ typedef struct {
 	DWORD writeTotalConstant;
 }Timeout;
 
-bool readTimeoutBlocking(RssconwindowsPortdata* portdata);
-
-bool readTimeoutNonblocking(RssconwindowsPortdata* portdata);
-
-bool purge(RssconwindowsPortdata* portdata);
-
-// Sets timeouts for the port.
-bool timeouts(RssconwindowsPortdata* portdata, Timeout* timeout);
-
 bool rssconwindowsFree(Rsscon* rsscon) {
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
 	log_debug(log, "free all windows data structures for rsscon %d.", rsscon);
@@ -109,6 +100,8 @@ bool rssconwindowsOpen(Rsscon* rsscon) {
 	bool setCommConfiguration(const char*, RssconwindowsPortdata*, DCB*);
 	bool setCommState(const char*, RssconwindowsPortdata*, DCB*);
 	bool handshakeOff(RssconwindowsPortdata* portdata);
+	bool readTimeoutBlocking(RssconwindowsPortdata* pdata);
+	bool readTimeoutNonblocking(RssconwindowsPortdata* pdata);
 
 	assert(rsscon != NULL);
 	assert(rsscon->portdata != NULL);
@@ -241,13 +234,11 @@ bool handshakeOff(RssconwindowsPortdata* pdata) {
 	return true;
 }
 
-bool readTimeoutBlocking(RssconwindowsPortdata* pdata)
-{
+bool readTimeoutBlocking(RssconwindowsPortdata* pdata) {
 	assert(pdata != NULL);
 
 	COMMTIMEOUTS cto;
-	if ( !GetCommTimeouts(pdata->portHandle, &cto) )
-	{
+	if (!GetCommTimeouts(pdata->portHandle, &cto)) {
 		fputs("Failed to get port timeouts.\n", stderr);
 		pdata->lastError = GetLastError();
 		return false;
@@ -255,8 +246,7 @@ bool readTimeoutBlocking(RssconwindowsPortdata* pdata)
 	cto.ReadIntervalTimeout = 0;
 	cto.ReadTotalTimeoutConstant = 0;
 	cto.ReadTotalTimeoutMultiplier = 0;
-	if ( !SetCommTimeouts(pdata->portHandle, &cto) )
-	{
+	if (!SetCommTimeouts(pdata->portHandle, &cto)) {
 		fputs("Failed to set port timeouts.\n", stderr);
 		pdata->lastError = GetLastError();
 		return false;
@@ -265,8 +255,7 @@ bool readTimeoutBlocking(RssconwindowsPortdata* pdata)
 	return true;
 }
 
-bool readTimeoutNonblocking(RssconwindowsPortdata* pdata)
-{
+bool readTimeoutNonblocking(RssconwindowsPortdata* pdata) {
 	assert(pdata != NULL);
 
 	COMMTIMEOUTS cto;
@@ -309,6 +298,18 @@ bool timeouts(RssconwindowsPortdata* portdata, Timeout* timeout)
 	return false;
 }
 
+bool purge(RssconwindowsPortdata* pdata) {
+	assert(pdata != NULL);
+
+	if (!PurgeComm(pdata->portHandle, PURGE_TXCLEAR | PURGE_RXCLEAR)) {
+		pdata->lastError = GetLastError();
+		fprintf(stderr, "failed to purge the port.\n");
+		return false;
+	}
+
+	return true;
+}
+
 bool rssconwindowsRead(Rsscon* rsscon, void* data, size_t length, size_t* readed) {
 	assert(rsscon != NULL);
 	RssconwindowsPortdata* pdata = (RssconwindowsPortdata*)rsscon->portdata;
@@ -329,20 +330,6 @@ bool rssconwindowsRead(Rsscon* rsscon, void* data, size_t length, size_t* readed
 	}
 
 	*readed = r;
-	return true;
-}
-
-bool purge(RssconwindowsPortdata* pdata)
-{
-	assert(pdata != NULL);
-
-	if ( !PurgeComm(pdata->portHandle, PURGE_TXCLEAR | PURGE_RXCLEAR) )
-	{
-		pdata->lastError = GetLastError();
-		fprintf(stderr, "failed to purge the port.\n");
-		return false;
-	}
-
 	return true;
 }
 
