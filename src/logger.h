@@ -24,11 +24,11 @@
 
 #include <stdarg.h>
 
-#ifndef NO_LOG
+#ifndef RSSCON_NOLOG4C
 #include <log4c.h>
 #endif
 
-#ifndef NO_LOG
+#ifndef RSSCON_NOLOG4C
 #define LOG4C_CATEGORY log4c_category_t *
 #else
 #define LOG4C_CATEGORY void *

@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#ifndef NO_LOG
+#ifndef RSSCON_NOLOG4C
 
 static int log4c_init_counter = 0;
 
