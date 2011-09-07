@@ -17,12 +17,12 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * rsscon. If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef RSSCON_NOLOG4C
+
 #include "logger.h"
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdlib.h>
-
-#ifndef RSSCON_NOLOG4C
 
 static int log4c_init_counter = 0;
 
@@ -67,28 +67,6 @@ void log_leave(const LOG4C_CATEGORY category, const char* name, ...) {
 	va_start(va, name);
 	log_debug(category, name, va);
 	va_end(va);
-}
-
-#else
-
-LOG4C_CATEGORY get_log(const char* name) {
-	return NULL;
-}
-
-int free_log() {
-	return true;
-}
-
-void log_vdebug(const LOG4C_CATEGORY category, const char* format, va_list args){
-}
-
-void log_debug(const LOG4C_CATEGORY category, const char* format, ...) {
-}
-
-void log_enter(const LOG4C_CATEGORY category, const char* name, ...) {
-}
-
-void log_leave(const LOG4C_CATEGORY category, const char* name, ...) {
 }
 
 #endif
