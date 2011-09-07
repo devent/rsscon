@@ -382,8 +382,8 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.exe.debug.option.optimization.level.61244844" name="Optimization Level" superClass="gnu.c.compiler.exe.debug.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.exe.debug.option.debugging.level.2078190554" name="Debug Level" superClass="gnu.c.compiler.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.196784445" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="RSSCON_LOGSIMPLE"/>
 									<listOptionValue builtIn="false" value="RSSCON_NOLOG4C"/>
-									<listOptionValue builtIn="false" value="RSSCON_NOLOG"/>
 									<listOptionValue builtIn="false" value="RSSCON_WINDOWS"/>
 								</option>
 								<option id="gnu.c.compiler.option.misc.other.912133919" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0" valueType="string"/>
