@@ -50,7 +50,7 @@ typedef struct {
 
 Rsscon* rssconCreate(const char* device, unsigned int baudRate) {
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
-	log_enter(log, "rssconCreate('%s', %d)", device, baudRate);
+	log_info(log, "create the device '%s' with the baud rate %d.", device, baudRate);
 
 	log_debug(log, "allocate rsscon data structure...");
 	Rsscon* rsscon = malloc(sizeof(Rsscon));
@@ -78,7 +78,7 @@ Rsscon* rssconCreate(const char* device, unsigned int baudRate) {
 	private->open = false;
 	private->lastError = RSSCON_ERROR_NOERROR;
 
-	log_leave(log, "leave rssconCreate:=%d", rsscon);
+	log_debug(log, "finish creating device '%s'.", device);
 	free_log();
 	return rsscon;
 }
