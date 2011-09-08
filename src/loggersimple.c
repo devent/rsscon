@@ -24,11 +24,18 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+typedef struct {
+
+	const char* categoryName;
+
+} RssconLoggerSimple;
+
 LOG4C_CATEGORY get_log(const char* name) {
-	return NULL;
+	return malloc(sizeof(RssconLoggerSimple));
 }
 
 int free_log() {
+
 	return true;
 }
 
