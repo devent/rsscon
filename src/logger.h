@@ -41,6 +41,8 @@ LOG4C_CATEGORY get_log(const char* name);
 
 int free_log();
 
+void log_info(const LOG4C_CATEGORY category, const char* format, ...);
+
 void log_debug(const LOG4C_CATEGORY category, const char* format, ...);
 
 void log_error(const LOG4C_CATEGORY category, const char* format, ...);
