@@ -154,7 +154,7 @@ bool rssconRead(Rsscon* rsscon, void* data, size_t length, size_t* red) {
 
 void rssconSetLastError(Rsscon* rsscon, int lastError) {
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
-	log_enter(log, "rssconSetLastError(%d)", rsscon);
+	log_enter(log, "rssconSetLastError(%d, %d)", rsscon, lastError);
 
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);

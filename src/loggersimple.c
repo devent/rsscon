@@ -34,19 +34,25 @@ typedef struct {
 
 RssconLoggerSimple* loggerGlobal = NULL;
 
-LOG4C_CATEGORY get_log(const char* name) {
-	assert(loggerGlobal == NULL);
+int loggerReferences = 0;
 
-	loggerGlobal = malloc(sizeof(RssconLoggerSimple));
+LOG4C_CATEGORY get_log(const char* name) {
+	if (loggerReferences == 0) {
+		assert(loggerGlobal == NULL);
+		loggerGlobal = malloc(sizeof(RssconLoggerSimple));
+	}
+	loggerReferences++;
 	loggerGlobal->categoryName = name;
 	return loggerGlobal;
 }
 
 int free_log() {
-	assert(loggerGlobal != NULL);
-
-	free(loggerGlobal);
-	loggerGlobal = NULL;
+	loggerReferences--;
+	if (loggerReferences == 0) {
+		assert(loggerGlobal != NULL);
+		free(loggerGlobal);
+		loggerGlobal = NULL;
+	}
 	return true;
 }
 
@@ -54,7 +60,7 @@ void log_vdebug(const LOG4C_CATEGORY category, const char* format, va_list args)
 	RssconLoggerSimple* logger = (RssconLoggerSimple*)category;
 
 	fprintf(stderr, "[debug] %s: ", logger->categoryName);
-	fprintf(stderr, format, args);
+	vfprintf(stderr, format, args);
 	fprintf(stderr, "\n");
 }
 
