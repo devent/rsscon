@@ -41,9 +41,9 @@ LOG4C_CATEGORY get_log(const char* name);
 
 int free_log();
 
-void log_vdebug(const LOG4C_CATEGORY category, const char* format, va_list args);
-
 void log_debug(const LOG4C_CATEGORY category, const char* format, ...);
+
+void log_error(const LOG4C_CATEGORY category, const char* format, ...);
 
 void log_enter(const LOG4C_CATEGORY category, const char* name, ...);
 

@@ -85,4 +85,19 @@ void log_leave(const LOG4C_CATEGORY category, const char* name, ...) {
 	va_end(va);
 }
 
+void log_verror(const LOG4C_CATEGORY category, const char* format, va_list args){
+	RssconLoggerSimple* logger = (RssconLoggerSimple*)category;
+
+	fprintf(stderr, "[error] %s: ", logger->categoryName);
+	vfprintf(stderr, format, args);
+	fprintf(stderr, "\n");
+}
+
+void log_error(const LOG4C_CATEGORY category, const char* format, ...) {
+	va_list va;
+	va_start(va, format);
+	log_verror(category, format, va);
+	va_end(va);
+}
+
 #endif
