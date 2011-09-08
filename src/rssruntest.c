@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "rsscon.h"
-#ifdef LINUX
+#ifdef RSSCON_LINUX
 #include "rssconlinux.h"
 #endif
 #ifdef RSSCON_WINDOWS
@@ -130,7 +130,7 @@ bool readData(Rsscon* rsscon) {
 }
 
 int main() {
-#ifdef LINUX
+#ifdef RSSCON_LINUX
 	const char* device = "/dev/ttyUSB5";
 #endif
 #ifdef RSSCON_WINDOWS
