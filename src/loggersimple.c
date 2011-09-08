@@ -20,9 +20,11 @@
 #ifdef RSSCON_LOGSIMPLE
 
 #include "logger.h"
+#include <assert.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 typedef struct {
 
@@ -30,25 +32,51 @@ typedef struct {
 
 } RssconLoggerSimple;
 
+RssconLoggerSimple* loggerGlobal = NULL;
+
 LOG4C_CATEGORY get_log(const char* name) {
-	return malloc(sizeof(RssconLoggerSimple));
+	assert(loggerGlobal == NULL);
+
+	loggerGlobal = malloc(sizeof(RssconLoggerSimple));
+	loggerGlobal->categoryName = name;
+	return loggerGlobal;
 }
 
 int free_log() {
+	assert(loggerGlobal != NULL);
 
+	free(loggerGlobal);
+	loggerGlobal = NULL;
 	return true;
 }
 
 void log_vdebug(const LOG4C_CATEGORY category, const char* format, va_list args){
+	RssconLoggerSimple* logger = (RssconLoggerSimple*)category;
+
+	fprintf(stderr, "[debug] %s: ", logger->categoryName);
+	fprintf(stderr, format, args);
+	fprintf(stderr, "\n");
 }
 
 void log_debug(const LOG4C_CATEGORY category, const char* format, ...) {
+	va_list va;
+	va_start(va, format);
+	log_vdebug(category, format, va);
+	va_end(va);
 }
 
 void log_enter(const LOG4C_CATEGORY category, const char* name, ...) {
+	va_list va;
+	va_start(va, name);
+	log_vdebug(category, name, va);
+	va_end(va);
 }
 
 void log_leave(const LOG4C_CATEGORY category, const char* name, ...) {
+	va_list va;
+	va_start(va, name);
+	log_debug(category, name, va);
+	va_end(va);
 }
 
 #endif
