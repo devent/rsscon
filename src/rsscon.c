@@ -46,7 +46,7 @@ typedef struct {
 
 } RssconPrivate;
 
-#define LOG_CATEGORY "com.globalscalingsoftware.rsscon"
+#define LOG_CATEGORY "com.globalscalingsoftware.rsscon.rsscon"
 
 Rsscon* rssconCreate(const char* device, unsigned int baudRate) {
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
@@ -108,6 +108,7 @@ bool rssconFree(Rsscon* rsscon) {
 	free(rsscon);
 
 	log_leave(log, "leave rssconFree:=true");
+	free_log();
 	return true;
 }
 
@@ -117,6 +118,7 @@ bool rssconOpen(Rsscon* rsscon) {
 
 	assert(rsscon != NULL);
 	assert(rsscon->rssconOpen != NULL);
+	free_log();
 	return rsscon->rssconOpen(rsscon);
 }
 
@@ -126,6 +128,7 @@ bool rssconClose(Rsscon* rsscon) {
 
 	assert(rsscon != NULL);
 	assert(rsscon->rssconClose != NULL);
+	free_log();
 	return rsscon->rssconClose(rsscon);
 }
 
@@ -135,6 +138,7 @@ bool rssconWrite(Rsscon* rsscon, const void* data, size_t length, size_t* wrote)
 
 	assert(rsscon != NULL);
 	assert(rsscon->rssconWrite != NULL);
+	free_log();
 	return rsscon->rssconWrite(rsscon, data, length, wrote);
 }
 
@@ -144,6 +148,7 @@ bool rssconRead(Rsscon* rsscon, void* data, size_t length, size_t* red) {
 
 	assert(rsscon != NULL);
 	assert(rsscon->rssconRead != NULL);
+	free_log();
 	return rsscon->rssconRead(rsscon, data, length, red);
 }
 
@@ -154,7 +159,8 @@ void rssconSetLastError(Rsscon* rsscon, int lastError) {
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
-private->lastError = lastError;
+	private->lastError = lastError;
+	free_log();
 }
 
 int rssconGetLastError(Rsscon* rsscon) {
@@ -164,6 +170,7 @@ int rssconGetLastError(Rsscon* rsscon) {
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
+	free_log();
 	return private->lastError;
 }
 
@@ -174,6 +181,7 @@ bool rssconIsOpen(Rsscon* rsscon) {
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
+	free_log();
 	return private->open;
 }
 
@@ -184,6 +192,7 @@ const char* rssconGetDevice(Rsscon* rsscon) {
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
+	free_log();
 	return private->device;
 }
 
@@ -194,5 +203,6 @@ unsigned int rssconGetBaudRate(Rsscon* rsscon) {
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
+	free_log();
 	return private->baudRate;
 }
