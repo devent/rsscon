@@ -46,10 +46,32 @@ void log_vdebug(const LOG4C_CATEGORY category, const char* format, va_list args)
 	log4c_category_vlog(category, LOG4C_PRIORITY_DEBUG, format, args);
 }
 
+void log_vinfo(const LOG4C_CATEGORY category, const char* format, va_list args){
+	log4c_category_vlog(category, LOG4C_PRIORITY_INFO, format, args);
+}
+
+void log_verror(const LOG4C_CATEGORY category, const char* format, va_list args){
+	log4c_category_vlog(category, LOG4C_PRIORITY_ERROR, format, args);
+}
+
+void log_info(const LOG4C_CATEGORY category, const char* format, ...) {
+	va_list va;
+	va_start(va, format);
+	log_vinfo(category, format, va);
+	va_end(va);
+}
+
 void log_debug(const LOG4C_CATEGORY category, const char* format, ...) {
 	va_list va;
 	va_start(va, format);
 	log_vdebug(category, format, va);
+	va_end(va);
+}
+
+void log_error(const LOG4C_CATEGORY category, const char* format, ...) {
+	va_list va;
+	va_start(va, format);
+	log_verror(category, format, va);
 	va_end(va);
 }
 
