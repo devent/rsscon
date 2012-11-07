@@ -33,7 +33,7 @@
 #include "rssconlinux.h"
 #include "logger.h"
 
-#define LOG_CATEGORY "com.globalscalingsoftware.rsscon.rssconlinux"
+#define LOG_CATEGORY "com.anrisoftware.rsscon.rssconlinux"
 
 typedef struct {
 
@@ -144,11 +144,10 @@ bool rssconlinuxFree(Rsscon* rsscon) {
 }
 
 bool rssconlinuxInit(Rsscon* rsscon) {
-#ifdef RSSCON_LOGING
-	printf("%d: rssconlinuxInit...\n", __LINE__);
-#endif
 	assert(rsscon != NULL);
 	assert(rsscon->portdata != NULL);
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconlinuxInit");
 	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
 
 	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
@@ -161,14 +160,14 @@ bool rssconlinuxInit(Rsscon* rsscon) {
 	pdata->noblock = false;
 	pdata->wait = false;
 
+	log_leave(log, "rssconlinuxInit := true");
+	free_log();
 	return true;
 }
 
 bool setup(Rsscon* rsscon) {
-#ifdef RSSCON_LOGING
-	printf("%d: setup...\n", __LINE__);
-#endif
-
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_enter(log, "setup");
 	assert(rsscon != NULL);
 	assert(rsscon->portdata != NULL);
 	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
@@ -179,6 +178,8 @@ bool setup(Rsscon* rsscon) {
 
 	if (tcgetattr(pdata->fd, tio1)) {
 		rssconSetLastError(rsscon, RSSCON_ERROR_SETUPDEVICE);
+		log_leave(log, "rssconlinuxInit := false");
+		free_log();
 		return false;
 	}
 
@@ -194,12 +195,16 @@ bool setup(Rsscon* rsscon) {
 	tcflush(pdata->fd, TCIOFLUSH);
 	if (tcsetattr(pdata->fd, TCSANOW, tio2)) {
 		rssconSetLastError(rsscon, RSSCON_ERROR_SETUPDEVICE);
+		log_leave(log, "rssconlinuxInit := false");
+		free_log();
 		return false;
 	}
 #if 0
 	tcflow(pdata->fd, TCOON); tcflow(pdata->fd, TCION);
 #endif
 
+	log_leave(log, "rssconlinuxInit := true");
+	free_log();
 	return true;
 }
 
@@ -207,6 +212,7 @@ bool rssconlinuxOpen(Rsscon* rsscon) {
 	assert(rsscon != NULL);
 	assert(rsscon->portdata != NULL);
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconlinuxOpen");
 	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
 
 	log_debug(log, "set last error to RSSCON_ERROR_NOERROR.");
@@ -222,8 +228,9 @@ bool rssconlinuxOpen(Rsscon* rsscon) {
 	log_debug(log, "open device '%s' with flag '%d'.", device, flag);
 	pdata->fd = open(device, flag);
 	if (pdata->fd == -1) {
-		log_error(log, "error open device '%s': %s\n", device, strerrno(errno));
+		log_error(log, "error open device '%s': %s", device, strerrno(errno));
 		rssconSetLastError(rsscon, RSSCON_ERROR_OPENDEVICE);
+		log_leave(log, "rssconlinuxOpen := true");
 		free_log();
 		return false;
 	}
@@ -231,25 +238,26 @@ bool rssconlinuxOpen(Rsscon* rsscon) {
 	log_debug(log, "setup device '%s' with flag '%d'.", device, flag);
 	bool ret = setup(rsscon);
 	if (!ret) {
-		log_error(log, "error setup device '%s': %s\n", device, strerrno(errno));
+		log_error(log, "error setup device '%s': %s", device, strerrno(errno));
 		rssconSetLastError(rsscon, RSSCON_ERROR_OPENDEVICE);
+		log_leave(log, "rssconlinuxOpen := true");
 		free_log();
 		return false;
 	}
 
 	log_debug(log, "finish creating device '%s'.", device);
+	log_leave(log, "rssconlinuxOpen := true");
 	free_log();
 	return true;
 }
 
 bool rssconlinuxClose(Rsscon* rsscon) {
-#ifdef RSSCON_LOGING
-	printf("%d: rssconlinuxClose...\n", __LINE__);
-#endif
-
 	assert(rsscon != NULL);
 	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
 	assert(pdata->fd != 0);
+
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconlinuxClose");
 
 	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
 
@@ -258,39 +266,42 @@ bool rssconlinuxClose(Rsscon* rsscon) {
 	int ret = close(pdata->fd);
 	if (ret != 0) {
 		rssconSetLastError(rsscon, RSSCON_ERROR_CLOSEDEVICE);
+		log_leave(log, "rssconlinuxClose := false");
+		free_log();
 		return false;
 	}
 
 	pdata->fd = 0;
+	log_leave(log, "rssconlinuxClose := true");
+	free_log();
 	return true;
 }
 
 bool rssconlinuxWrite(Rsscon* rsscon, const void* data, size_t length,
 		size_t* wrote) {
-#ifdef RSSCON_LOGING
-	printf("%d: rssconlinuxWrite...\n", __LINE__);
-#endif
-
 	assert(rsscon != NULL);
 	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
 	assert(pdata->fd != 0);
+
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconlinuxWrite");
 
 	ssize_t ret = write(pdata->fd, data, length);
 	tcdrain(pdata->fd);
 	if (ret == -1) {
 		rssconSetLastError(rsscon, RSSCON_ERROR_WRITE);
+		log_leave(log, "rssconlinuxWrite := false");
+		free_log();
 		return false;
 	}
 	*wrote = ret;
 
+	log_leave(log, "rssconlinuxWrite := true");
+	free_log();
 	return true;
 }
 
 bool waittodata(RssconlinuxPortdata* pdata, fd_set* set, struct timeval* tv) {
-#ifdef RSSCON_LOGING
-	printf("%d: waittodata...\n", __LINE__);
-#endif
-
 	FD_ZERO(set);
 	FD_SET(pdata->fd, set);
 	tv->tv_sec = pdata->tvsec;
@@ -304,13 +315,12 @@ bool waittodata(RssconlinuxPortdata* pdata, fd_set* set, struct timeval* tv) {
 }
 
 bool rssconlinuxRead(Rsscon* rsscon, void* data, size_t length, size_t* readed) {
-#ifdef RSSCON_LOGING
-	printf("%d: rssconlinuxRead...\n", __LINE__);
-#endif
-
 	assert(rsscon != NULL);
 	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
 	assert(pdata->fd != 0);
+
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconlinuxRead");
 
 	struct timeval tv;
 	fd_set set;
@@ -318,7 +328,9 @@ bool rssconlinuxRead(Rsscon* rsscon, void* data, size_t length, size_t* readed) 
 	if (pdata->wait) {
 		if (!waittodata(pdata, &set, &tv)) {
 			rssconSetLastError(rsscon, RSSCON_ERROR_READ);
-			fprintf(stderr, "error wait device.\n");
+			log_error(log, "Error wait device.");
+			log_leave(log, "rssconlinuxRead := false");
+			free_log();
 			return false;
 		}
 	}
@@ -326,7 +338,9 @@ bool rssconlinuxRead(Rsscon* rsscon, void* data, size_t length, size_t* readed) 
 		if (pdata->wait) {
 			if (!waittodata(pdata, &set, &tv)) {
 				rssconSetLastError(rsscon, RSSCON_ERROR_READ);
-				fprintf(stderr, "error wait device.\n");
+				log_error(log, "Error wait device.");
+				log_leave(log, "rssconlinuxRead := false");
+				free_log();
 				return false;
 			}
 		}
@@ -336,18 +350,23 @@ bool rssconlinuxRead(Rsscon* rsscon, void* data, size_t length, size_t* readed) 
 	}
 	if (ret == -1) {
 		rssconSetLastError(rsscon, RSSCON_ERROR_READ);
-		fprintf(stderr, "error read device.\n");
+		log_error(log, "Error read device.");
+		log_leave(log, "rssconlinuxRead := false");
+		free_log();
 		return false;
 	}
 
 	*readed = ret;
+	log_debug(log, "Read %d data.", ret);
+	log_leave(log, "rssconlinuxRead := true");
+	free_log();
 	return true;
 }
 
 bool rssconInit(Rsscon* rsscon) {
-#ifdef RSSCON_LOGING
-	printf("%d: rssconlinuxSetupInterface...\n", __LINE__);
-#endif
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_enter(log, "rssconInit");
+
 	RssconlinuxPortdata* portdata = malloc(sizeof(RssconlinuxPortdata));
 	rsscon->portdata = portdata;
 	rsscon->rssconInit = rssconlinuxInit;
@@ -357,6 +376,8 @@ bool rssconInit(Rsscon* rsscon) {
 	rsscon->rssconWrite = rssconlinuxWrite;
 	rsscon->rssconRead = rssconlinuxRead;
 
+	log_leave(log, "rssconInit");
+	free_log();
 	return rsscon->rssconInit(rsscon);
 }
 

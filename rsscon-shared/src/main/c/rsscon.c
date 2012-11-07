@@ -46,21 +46,23 @@ typedef struct {
 
 } RssconPrivate;
 
-#define LOG_CATEGORY "com.globalscalingsoftware.rsscon.rsscon"
+#define LOG_CATEGORY "com.anrisoftware.rsscon.rsscon"
 
 Rsscon* rssconCreate(const char* device, unsigned int baudRate) {
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
 	log_info(log, "create the device '%s' with the baud rate %d.", device, baudRate);
 
-	log_debug(log, "allocate rsscon data structure...");
+	log_debug(log, "allocate rsscon data structure.");
 	Rsscon* rsscon = malloc(sizeof(Rsscon));
 	if (rsscon == NULL) {
+		free_log();
 		return NULL;
 	}
 
-	log_debug(log, "allocate rsscon private data structure...");
+	log_debug(log, "allocate rsscon private data structure.");
 	RssconPrivate* private = malloc(sizeof(RssconPrivate));
 	if (private == NULL) {
+		free_log();
 		return NULL;
 	}
 
@@ -99,12 +101,14 @@ bool rssconFree(Rsscon* rsscon) {
 	log_debug(log, "free data from implementation.");
 	if (!freeChildIfChildWasSet(rsscon)) {
 		log_leave(log, "leave rssconFree:=%d", false);
+		free_log();
 		return false;
 	}
 
 	log_debug(log, "free private and rsscon structure.");
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
 	free(private);
+	rsscon->private = NULL;
 	free(rsscon);
 
 	free_log();
