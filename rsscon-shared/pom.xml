@@ -24,6 +24,7 @@
 				<artifactId>maven-nar-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
+					<output>rsscon.${project.version}</output>
 					<libraries>
 						<library>
 							<type>shared</type>
