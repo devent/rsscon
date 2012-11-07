@@ -76,15 +76,19 @@ void log_error(const LOG4C_CATEGORY category, const char* format, ...) {
 }
 
 void log_enter(const LOG4C_CATEGORY category, const char* name, ...) {
+	char buffer[1024];
 	va_list va;
 	va_start(va, name);
-	log_vdebug(category, name, va);
+	snprintf(buffer, sizeof(buffer), "%s%s", "enter: ", name);
+	log_vdebug(category, buffer, va);
 	va_end(va);
 }
 
 void log_leave(const LOG4C_CATEGORY category, const char* name, ...) {
+	char buffer[1024];
 	va_list va;
 	va_start(va, name);
-	log_debug(category, name, va);
+	snprintf(buffer, sizeof(buffer), "%s%s", "leave: ", name);
+	log_debug(category, buffer, va);
 	va_end(va);
 }
