@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.anrisoftware.globalpom</groupId>
+		<artifactId>globalpom-parent</artifactId>
+		<version>1.24-SNAPSHOT</version>
+	</parent>
+
+	<groupId>com.anrisoftware.rsscon</groupId>
+	<artifactId>rsscon-parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>Rsscon :: Parent</name>
+	<description>Manages meta-information and dependencies for the Rsscon project.</description>
+	<inceptionYear>2012</inceptionYear>
+
+	<developers>
+		<developer>
+			<id>EM</id>
+			<name>Erwin Müller</name>
+			<organization>Advanced Natural Research Insitute GmbH</organization>
+			<email>erwin.mueller@deventm.org</email>
+			<roles>
+				<role>Owner</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>LGPLv3</name>
+			<url>http://www.gnu.org/licenses/lgpl.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<properties>
+		<project.custom.year>${project.custom.current.year}</project.custom.year>
+	</properties>
+
+	<scm>
+		<connection>scm:git:${custom.gitpublic.url}rsscon.git</connection>
+		<developerConnection>scm:git:${custom.gitpublic.url}rsscon.git</developerConnection>
+		<url>scm:git:${custom.gitpublic.url}rsscon.git</url>
+	</scm>
+
+</project>
