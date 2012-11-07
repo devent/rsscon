@@ -1,10 +1,12 @@
-Debug/
-Rsscon Run Test/
-Rsscon Run Test No Log/
-Rsscon Test Suite/
-Shared Lib Linux/
-Rsscon Windows Run Test/
-*~
 .project
-.cproject
+.settings
+.classpath
+target
+test-output
+*~
+*~?
+*~??
+*.class
+*.log
+jspf.cache
 .directory
