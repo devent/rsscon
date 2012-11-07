@@ -30,6 +30,13 @@
 							<type>shared</type>
 						</library>
 					</libraries>
+					<linker>
+						<sysLibs>
+							<sysLib>
+								<name>log4c</name>
+							</sysLib>
+						</sysLibs>
+					</linker>
 				</configuration>
 			</plugin>
 		</plugins>
