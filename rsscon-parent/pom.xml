@@ -7,6 +7,7 @@
 		<groupId>com.anrisoftware.globalpom</groupId>
 		<artifactId>globalpom-parent</artifactId>
 		<version>1.24-SNAPSHOT</version>
+		<relativePath />
 	</parent>
 
 	<groupId>com.anrisoftware.rsscon</groupId>
