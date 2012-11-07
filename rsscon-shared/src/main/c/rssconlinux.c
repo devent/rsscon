@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * rsscon. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifdef RSSCON_LINUX
+#ifdef __linux
 
 #include <stdbool.h>
 #include <assert.h>
