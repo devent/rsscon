@@ -37,6 +37,18 @@
 							</sysLib>
 						</sysLibs>
 					</linker>
+					<c>
+					</c>
+					<sourceDirectory>main/src/c</sourceDirectory>
+					<includes>
+						<include>main/src/include</include>
+					</includes>
+					<excludes>
+						<exclude>*.mk</exclude>
+                        <exclude>*.o</exclude>
+                        <exclude>*.d</exclude>
+                        <exclude>makefile</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>
