@@ -25,11 +25,11 @@
 #include "CMemLeak.h"
 
 #include "rsscon.h"
-#ifdef LINUX
+#ifdef __linux
 #include "rssconlinux.h"
 #endif
 
-#ifdef LINUX
+#ifdef __linux
 const char* device_path = "/dev/ttyUSB5";
 #endif
 
