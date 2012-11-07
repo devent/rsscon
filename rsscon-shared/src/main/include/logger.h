@@ -23,19 +23,9 @@
 #define LOGGER_H_
 
 #include <stdarg.h>
-
-#ifdef RSSCON_LOG4C
 #include <log4c.h>
+
 #define LOG4C_CATEGORY log4c_category_t *
-#endif
-
-#ifdef RSSCON_NOLOG
-#define LOG4C_CATEGORY void *
-#endif
-
-#ifdef RSSCON_LOGSIMPLE
-#define LOG4C_CATEGORY void *
-#endif
 
 LOG4C_CATEGORY get_log(const char* name);
 
