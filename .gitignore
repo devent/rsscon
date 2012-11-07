@@ -10,3 +10,6 @@ test-output
 *.log
 jspf.cache
 .directory
+Debug/
+keypenruntest/
+.cproject
