@@ -17,8 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * rsscon. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifdef RSSCON_LOG4C
-
 #include "logger.h"
 #include <stdarg.h>
 #include <stdbool.h>
@@ -68,5 +66,3 @@ void log_leave(const LOG4C_CATEGORY category, const char* name, ...) {
 	log_debug(category, name, va);
 	va_end(va);
 }
-
-#endif
