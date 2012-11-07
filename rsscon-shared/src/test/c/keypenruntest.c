@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "logger.h"
 #include "rsscon.h"
 #ifdef __linux
 #include "rssconlinux.h"
@@ -30,6 +31,9 @@
 #ifdef RSSCON_WINDOWS
 #include "rssconwindows.h"
 #endif
+
+#define LOG_CATEGORY "com.anrisoftware.rsscon.keypenruntest"
+
 
 void printRssconError(const Rsscon* rsscon) {
 	int err = rssconGetLastError(rsscon);
@@ -122,17 +126,22 @@ int main() {
 #ifdef RSSCON_WINDOWS
 	const char* device = "COM:5";
 #endif
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+
+	log_info(log, "create rsscon");
 	unsigned int baudrate = RSSCON_BAUDRATE_921600;
 	Rsscon* rsscon = rssconCreate(device, baudrate);
 	printErrorUnless(rsscon != NULL, "rsscon is null.");
 	exitUnless(rsscon != NULL);
 
+	log_info(log, "init rsscon");
 	bool ret = rssconInit(rsscon);
 	printErrorUnless(ret, "rsscon init.");
 	printRssconError(rsscon);
 	cleanupUnless(ret, rsscon);
 	exitUnless(ret);
 
+	log_info(log, "open rsscon");
 	ret = rssconOpen(rsscon);
 	printErrorUnless(ret, "rsscon open.");
 	printRssconError(rsscon);
@@ -143,10 +152,12 @@ int main() {
 //	printRssconError(rsscon);
 //	cleanupUnless(ret, rsscon);
 
+	log_info(log, "read data");
 	ret = readData(rsscon);
 	printErrorUnless(ret, "read data.");
 	printRssconError(rsscon);
 	cleanupUnless(ret, rsscon);
 
+	free_log();
 	return 0;
 }
