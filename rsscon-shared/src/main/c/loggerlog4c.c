@@ -53,6 +53,10 @@ void log_verror(const LOG4C_CATEGORY category, const char* format, va_list args)
 	log4c_category_vlog(category, LOG4C_PRIORITY_ERROR, format, args);
 }
 
+void log_vtrace(const LOG4C_CATEGORY category, const char* format, va_list args){
+	log4c_category_vlog(category, LOG4C_PRIORITY_TRACE, format, args);
+}
+
 void log_info(const LOG4C_CATEGORY category, const char* format, ...) {
 	va_list va;
 	va_start(va, format);
@@ -79,7 +83,7 @@ void log_enter(const LOG4C_CATEGORY category, const char* name, ...) {
 	va_list va;
 	va_start(va, name);
 	snprintf(buffer, sizeof(buffer), "%s%s", "enter: ", name);
-	log_vdebug(category, buffer, va);
+	log_vtrace(category, buffer, va);
 	va_end(va);
 }
 
@@ -88,6 +92,6 @@ void log_leave(const LOG4C_CATEGORY category, const char* name, ...) {
 	va_list va;
 	va_start(va, name);
 	snprintf(buffer, sizeof(buffer), "%s%s", "leave: ", name);
-	log_debug(category, buffer, va);
+	log_vtrace(category, buffer, va);
 	va_end(va);
 }

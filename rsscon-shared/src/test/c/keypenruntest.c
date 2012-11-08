@@ -31,7 +31,6 @@
 
 #define LOG_CATEGORY "com.anrisoftware.rsscon.keypenruntest"
 
-
 void printRssconError(const Rsscon* rsscon) {
 	int err = rssconGetLastError(rsscon);
 	if (err == RSSCON_ERROR_NOERROR) {
@@ -70,45 +69,58 @@ void cleanupUnless(bool expression, Rsscon* rsscon) {
 	printRssconError(rsscon);
 }
 
-bool readDataToMax(Rsscon* rsscon, size_t max) {
-	char reddata;
-	size_t redlength = 1;
-	size_t red;
-	size_t count = 0;
+bool readDataSensorBlock(Rsscon* rsscon) {
+	size_t sensorCount = 16;
+	size_t size = sensorCount * 3;
+	char data[size];
+	size_t readBytes;
 
-	while (count < max) {
-		count++;
-		bool ret = rssconRead(rsscon, &reddata, redlength, &red);
+	bool ret = rssconRead(rsscon, data, size, &readBytes);
+	if (!ret) {
 		printErrorUnless(ret, "rsscon read.");
 		printRssconError(rsscon);
-		if (!ret) {
-			break;
-		}
-		printf("%s", &reddata);
+		return false;
 	}
-
+	int k;
+	for (k = 0; k < sensorCount; ++k) {
+		char intData[3];
+		memcpy(intData, &data[k * 3], sizeof(intData));
+		int value = *(int *) intData;
+		printf("%d ", value);
+	}
+	printf("\n");
 	return true;
 }
 
-bool writeCommand(Rsscon* rsscon, const char* command) {
-	size_t length = strlen(command);
+bool writeCommand(Rsscon* rsscon, const void* command, size_t size) {
+	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
+	log_info(log, "write command %d bytes.", size);
+
 	size_t wrote;
-	bool ret = rssconWrite(rsscon, command, length, &wrote);
+	bool ret = rssconWrite(rsscon, command, size, &wrote);
+
+	log_info(log, "wrote %d bytes.", wrote);
+	free_log();
 	return ret;
 }
 
 bool readData(Rsscon* rsscon) {
-	bool ret = writeCommand(rsscon, "\xFF\x80");
+	char startCommand[] = { 0x55, 0xAA, 0x80, 0xFF, 0xFF, 0xFF };
+	bool ret = writeCommand(rsscon, &startCommand, sizeof(startCommand));
 	if (!ret) {
 		return false;
 	}
 
-	ret = readDataToMax(rsscon, 63);
-	if (!ret) {
-		return false;
+	int i;
+	for (i = 0; i < 10; ++i) {
+		ret = readDataSensorBlock(rsscon);
+		if (!ret) {
+			return false;
+		}
 	}
 
-	ret = writeCommand(rsscon, "s");
+	char stopCommand[] = { 0x55, 0xAA, 0x00, 0xFF, 0xFF, 0xFF };
+	ret = writeCommand(rsscon, stopCommand, sizeof(stopCommand));
 	if (!ret) {
 		return false;
 	}
@@ -118,7 +130,7 @@ bool readData(Rsscon* rsscon) {
 
 int main() {
 #ifdef __linux
-	const char* device = "/dev/ttyUSB5";
+	const char* device = "/dev/ttyUSB0";
 #endif
 #ifdef RSSCON_WINDOWS
 	const char* device = "COM:5";
@@ -129,7 +141,7 @@ int main() {
 	unsigned int baudrate = RSSCON_BAUDRATE_921600;
 	Rsscon* rsscon = rssconCreate(device, baudrate);
 	printErrorUnless(rsscon != NULL, "rsscon is null.");
-	exitUnless(rsscon != NULL);
+	exitUnless(rsscon != NULL );
 
 	log_info(log, "init rsscon");
 	bool ret = rssconInit(rsscon);
