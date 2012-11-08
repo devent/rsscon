@@ -1,0 +1,62 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.anrisoftware.rsscon</groupId>
+		<artifactId>rsscon-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../rsscon-parent</relativePath>
+	</parent>
+
+	<artifactId>rsscon-jni</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>nar</packaging>
+	<name>Rsscon :: JNI</name>
+	<description>Reads and writes data to a RS-232 (serial) device with the help of a native library.</description>
+	<inceptionYear>2012</inceptionYear>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.anrisoftware.rsscon</groupId>
+			<artifactId>rsscon-shared</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>nar</type>
+		</dependency>
+		<dependency>
+			<groupId>com.anrisoftware.rsscon</groupId>
+			<artifactId>rsscon-api</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.inject.extensions</groupId>
+			<artifactId>guice-assistedinject</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.anrisoftware.globalpom</groupId>
+			<artifactId>globalpom-log</artifactId>
+			<version>1.5</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<defaultGoal>install</defaultGoal>
+		<plugins>
+			<plugin>
+				<artifactId>maven-nar-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<libraries>
+						<library>
+							<type>jni</type>
+							<narSystemPackage>com.anrisoftware.rsscon.nativeimpl</narSystemPackage>
+							<linkCPP>false</linkCPP>
+						</library>
+					</libraries>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
