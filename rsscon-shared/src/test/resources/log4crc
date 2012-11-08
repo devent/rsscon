@@ -4,7 +4,7 @@
 <log4c version="1.2.2">
 
     <config>
-        <bufsize>0</bufsize>
+        <bufsize>1024</bufsize>
         <debug level="2"/>
         <nocleanup>0</nocleanup>
     </config>
@@ -13,7 +13,7 @@
     <category name="root" priority="notice" />
 
     <category name="com.anrisoftware.rsscon.rsscon" priority="debug" appender="stderr"/>
-    <category name="com.anrisoftware.rsscon.rssconlinux" priority="debug" appender="stderr"/>
+    <category name="com.anrisoftware.rsscon.rssconlinux" priority="notice" appender="stdout"/>
     <category name="com.anrisoftware.rsscon.keypenruntest" priority="debug" appender="stderr"/>
 
     <!-- default appenders ===================================== -->
