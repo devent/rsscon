@@ -27,6 +27,7 @@
 					<output>rsscon.${project.version}</output>
 					<libraries>
 						<library>
+							<linkCPP>false</linkCPP>
 							<type>shared</type>
 						</library>
 					</libraries>
