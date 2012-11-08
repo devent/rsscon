@@ -45,9 +45,9 @@
 					</includes>
 					<excludes>
 						<exclude>*.mk</exclude>
-                        <exclude>*.o</exclude>
-                        <exclude>*.d</exclude>
-                        <exclude>makefile</exclude>
+						<exclude>*.o</exclude>
+						<exclude>*.d</exclude>
+						<exclude>makefile</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
