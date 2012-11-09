@@ -13,3 +13,8 @@ jspf.cache
 Debug/
 keypenruntest/
 .cproject
+*.mk
+makefile
+*.d
+*.o
+*.so
