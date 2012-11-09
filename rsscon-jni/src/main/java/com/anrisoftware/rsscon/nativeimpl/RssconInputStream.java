@@ -34,11 +34,11 @@ import com.google.inject.assistedinject.Assisted;
  */
 class RssconInputStream extends InputStream {
 
-	private final RssconNativeHelper rssconNative;
+	private final RssconNativeImpl rssconNative;
 
 	@Inject
 	RssconInputStream(@Assisted RssconNative rssconNative) {
-		this.rssconNative = (RssconNativeHelper) rssconNative;
+		this.rssconNative = (RssconNativeImpl) rssconNative;
 	}
 
 	@Override

@@ -18,14 +18,34 @@
  */
 package com.anrisoftware.rsscon.nativeimpl;
 
-import com.google.inject.AbstractModule;
+import java.io.InputStream;
+import java.io.OutputStream;
 
+import com.anrisoftware.rsscon.api.NativeRssconInputStreamFactory;
+import com.anrisoftware.rsscon.api.NativeRssconOutputStreamFactory;
+import com.anrisoftware.rsscon.api.RssconNative;
+import com.anrisoftware.rsscon.api.RssconNativeFactory;
+import com.google.inject.AbstractModule;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+
+/**
+ * Installs the native factories.
+ * 
+ * @author Erwin Mueller, erwin.mueller@deventm.org
+ * @since 1.0
+ */
 public class NativeRssconModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		// TODO Auto-generated method stub
-
+		install(new FactoryModuleBuilder().implement(RssconNative.class,
+				RssconNativeImpl.class).build(RssconNativeFactory.class));
+		install(new FactoryModuleBuilder().implement(OutputStream.class,
+				RssconOutputStream.class).build(
+				NativeRssconOutputStreamFactory.class));
+		install(new FactoryModuleBuilder().implement(InputStream.class,
+				RssconInputStream.class).build(
+				NativeRssconInputStreamFactory.class));
 	}
 
 }
