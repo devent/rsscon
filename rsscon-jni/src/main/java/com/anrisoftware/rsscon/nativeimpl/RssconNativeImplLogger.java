@@ -30,24 +30,24 @@ import com.anrisoftware.globalpom.log.AbstractLogger;
  * @author Erwin Mueller, erwin.mueller@deventm.org
  * @since 1.0
  */
-class RssconNativeHelperLogger extends AbstractLogger {
+class RssconNativeImplLogger extends AbstractLogger {
 
 	/**
 	 * Create logger for {@link RssconInputStream}.
 	 */
-	RssconNativeHelperLogger() {
+	RssconNativeImplLogger() {
 		super(RssconInputStream.class);
 	}
 
-	void closeRsscon(RssconNativeHelper rsscon) {
+	void closeRsscon(RssconNativeImpl rsscon) {
 		log.trace("Close {}.", rsscon);
 	}
 
-	void openDevice(RssconNativeHelper rsscon) {
+	void openDevice(RssconNativeImpl rsscon) {
 		log.trace("Open {}.", rsscon);
 	}
 
-	void writeBuffer(RssconNativeHelper rsscon, byte[] data) {
+	void writeBuffer(RssconNativeImpl rsscon, byte[] data) {
 		if (log.isTraceEnabled()) {
 			log.trace("Write buffer {} to {}.", toHexString(data), rsscon);
 		}
@@ -57,7 +57,7 @@ class RssconNativeHelperLogger extends AbstractLogger {
 		return toHexString(data, data.length);
 	}
 
-	void readBuffer(RssconNativeHelper rsscon, byte[] data, int bytes) {
+	void readBuffer(RssconNativeImpl rsscon, byte[] data, int bytes) {
 		if (log.isTraceEnabled()) {
 			log.trace("Write buffer {} to {}.", toHexString(data, bytes),
 					rsscon);

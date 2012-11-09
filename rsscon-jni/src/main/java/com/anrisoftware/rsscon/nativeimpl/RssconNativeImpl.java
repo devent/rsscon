@@ -33,7 +33,7 @@ import com.google.inject.assistedinject.Assisted;
  * @author Erwin Mueller, erwin.mueller@deventm.org
  * @version 2011
  */
-class RssconNativeHelper implements RssconNative {
+class RssconNativeImpl implements RssconNative {
 
 	static {
 		NarSystem.loadLibrary();
@@ -41,7 +41,7 @@ class RssconNativeHelper implements RssconNative {
 
 	private static final String LIB_RSSCONDRIVER = "rsscondriver";
 
-	private final RssconNativeHelperLogger log;
+	private final RssconNativeImplLogger log;
 
 	private final String device;
 
@@ -52,8 +52,8 @@ class RssconNativeHelper implements RssconNative {
 	private long reference;
 
 	@Inject
-	RssconNativeHelper(RssconNativeHelperLogger logger,
-			@Assisted String device, @Assisted BaudRate baudRate) {
+	RssconNativeImpl(RssconNativeImplLogger logger, @Assisted String device,
+			@Assisted BaudRate baudRate) {
 		this.log = logger;
 		this.device = device;
 		this.baudRate = baudRate;
