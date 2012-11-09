@@ -78,6 +78,13 @@ void log_error(const LOG4C_CATEGORY category, const char* format, ...) {
 	va_end(va);
 }
 
+void log_trace(const LOG4C_CATEGORY category, const char* format, ...) {
+	va_list va;
+	va_start(va, format);
+	log_vtrace(category, format, va);
+	va_end(va);
+}
+
 void log_enter(const LOG4C_CATEGORY category, const char* name, ...) {
 	char buffer[1024];
 	va_list va;

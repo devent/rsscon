@@ -34,6 +34,8 @@ void log_debug(const LOG4C_CATEGORY category, const char* format, ...);
 
 void log_error(const LOG4C_CATEGORY category, const char* format, ...);
 
+void log_trace(const LOG4C_CATEGORY category, const char* format, ...);
+
 void log_enter(const LOG4C_CATEGORY category, const char* name, ...);
 
 void log_leave(const LOG4C_CATEGORY category, const char* name, ...);
