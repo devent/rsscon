@@ -36,7 +36,10 @@
 		<dependency>
 			<groupId>com.anrisoftware.globalpom</groupId>
 			<artifactId>globalpom-log</artifactId>
-			<version>1.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-exec</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -47,13 +50,13 @@
 				<artifactId>maven-nar-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-                    <linker>
-                        <sysLibs>
-                            <sysLib>
-                                <name>log4c</name>
-                            </sysLib>
-                        </sysLibs>
-                    </linker>
+					<linker>
+						<sysLibs>
+							<sysLib>
+								<name>log4c</name>
+							</sysLib>
+						</sysLibs>
+					</linker>
 					<libraries>
 						<library>
 							<type>jni</type>
