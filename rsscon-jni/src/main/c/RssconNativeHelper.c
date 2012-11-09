@@ -132,19 +132,19 @@ void free_log_and_throw(JNIEnv *env) {
 JNIEXPORT jlong JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeHelper_rssconCreate(
         JNIEnv *env, jobject this, jstring devicestr, jint baudratenumber) {
     LOG4C_CATEGORY log = get_rsscon_log();
-    log_enter(log, "enter rssconCreate()");
+    log_enter(log, "rssconCreate");
 
     int baudrate = translateBaudrate(baudratenumber);
 
-    log_debug(log, "convert java string to c string...");
+    log_trace(log, "convert device name to c string.");
     char device[256];
     jsize length = (*env)->GetStringUTFLength(env, devicestr);
     (*env)->GetStringUTFRegion(env, devicestr, 0, length, device);
 
-    log_debug(log, "call rssconCreate(%s, %d)", device, baudrate);
+    log_trace(log, "create rsscon device '%s' %d.", device, baudrate);
     long rsscon = toJava(rssconCreate(device, baudrate));
 
-    log_leave(log, "leave rssconCreate():=%d", &rsscon);
+    log_leave(log, "rssconCreate := %d", &rsscon);
     free_log_and_throw(env);
     return rsscon;
 }
@@ -171,7 +171,7 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeHelpe
     bool ret = rssconInit(rsscon);
     if (!ret) {
         JNU_ThrowByName(env, JNU_CLASS_IOEXCEPTION,
-                "Could not setup rsscon driver.");
+                "Could not initialize the rsscon driver.");
     }
 }
 
@@ -196,7 +196,8 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeHelpe
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     bool ret = rssconClose(rsscon);
     if (!ret) {
-        JNU_ThrowByName(env, JNU_CLASS_IOEXCEPTION, "Could not close the port.");
+        JNU_ThrowByName(env, JNU_CLASS_IOEXCEPTION,
+        		"Could not close the port.");
     }
 }
 
