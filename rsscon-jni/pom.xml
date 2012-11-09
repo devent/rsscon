@@ -47,6 +47,13 @@
 				<artifactId>maven-nar-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
+                    <linker>
+                        <sysLibs>
+                            <sysLib>
+                                <name>log4c</name>
+                            </sysLib>
+                        </sysLibs>
+                    </linker>
 					<libraries>
 						<library>
 							<type>jni</type>
