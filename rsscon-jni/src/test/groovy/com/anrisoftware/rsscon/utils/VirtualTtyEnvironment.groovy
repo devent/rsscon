@@ -36,7 +36,7 @@ class VirtualTtyEnvironment {
 
 	ByteArrayOutputStream output
 
-	void startSocat() {
+	VirtualTtyEnvironment startSocat() {
 		output = new ByteArrayOutputStream()
 		def cmdline = new CommandLine("socat")
 		cmdline.addArgument "-d"

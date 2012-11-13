@@ -6,6 +6,7 @@ import org.junit.BeforeClass
 import com.anrisoftware.rsscon.api.NativeRssconInputStreamFactory
 import com.anrisoftware.rsscon.api.NativeRssconOutputStreamFactory
 import com.anrisoftware.rsscon.api.RssconNativeFactory
+import com.anrisoftware.rsscon.nativeimpl.NativeRssconModule;
 import com.anrisoftware.rsscon.utils.VirtualTtyEnvironment
 import com.google.inject.Guice
 import com.google.inject.Injector

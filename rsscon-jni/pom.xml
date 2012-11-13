@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.anrisoftware.rsscon</groupId>
 		<artifactId>rsscon-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1.0</version>
 		<relativePath>../rsscon-parent</relativePath>
 	</parent>
 
@@ -30,13 +30,13 @@
 		<dependency>
 			<groupId>com.anrisoftware.rsscon</groupId>
 			<artifactId>rsscon-shared</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0</version>
 			<type>nar</type>
 		</dependency>
 		<dependency>
 			<groupId>com.anrisoftware.rsscon</groupId>
 			<artifactId>rsscon-api</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0</version>
 		</dependency>
 
 		<!-- compile dependencies -->
