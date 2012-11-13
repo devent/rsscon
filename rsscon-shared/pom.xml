@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>rsscon-shared</artifactId>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<packaging>nar</packaging>
 	<name>Rsscon :: Shared Library</name>
 	<description>Library to read and write to RS232 (serial) devices.</description>
