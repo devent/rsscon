@@ -38,12 +38,40 @@
 #define RSSCON_BAUDRATE_3500000 3500000
 #define RSSCON_BAUDRATE_4000000 4000000
 
+/**
+ * No error.
+ */
 #define RSSCON_ERROR_NOERROR 0
+
+/**
+ * Error opening the device.
+ */
 #define RSSCON_ERROR_OPENDEVICE -1
+
+/**
+ * Error closing the device.
+ */
 #define RSSCON_ERROR_CLOSEDEVICE -2
+
+/**
+ * Error setup the device.
+ */
 #define RSSCON_ERROR_SETUPDEVICE -3
-#define RSSCON_ERROR_WRITE -4
-#define RSSCON_ERROR_READ -5
+
+/**
+ * Error setting flags because device is already open.
+ */
+#define RSSCON_ERROR_DEVICE_OPENED -4
+
+/**
+ * Error writing to the device.
+ */
+#define RSSCON_ERROR_WRITE -5
+
+/**
+ * Error reading from the device.
+ */
+#define RSSCON_ERROR_READ -6
 
 typedef struct Rsscon Rsscon;
 
@@ -66,6 +94,10 @@ typedef bool (*RssconGetWait)(Rsscon*);
 typedef bool (*RssconWrite)(Rsscon*, const void*, size_t, size_t*);
 
 typedef bool (*RssconRead)(Rsscon*, void*, size_t, size_t*);
+
+typedef bool (*RssconSetErrorNumber)(Rsscon*, int);
+
+typedef int (*RssconGetErrorNumber)(Rsscon*);
 
 /**
  * Structure defines the public interface to rsscon.
@@ -172,6 +204,25 @@ struct Rsscon {
 	 */
 	RssconGetWait rssconGetWait;
 
+	/**
+	 * Sets the system specific error number from the last error caused by
+	 * accessing the port.
+	 *
+	 * (Rsscon*): the Rsscon data structure.
+	 * int: the code of the system error.
+	 * returns bool: true upon success, false upon failure.
+	 */
+	RssconSetErrorNumber rssconSetErrorNumber;
+
+	/**
+	 * Get the system specific error number from the last error caused by
+	 * accessing the port.
+	 *
+	 * (Rsscon*): the Rsscon data structure.
+	 * return int: the code of the system error.
+	 */
+	RssconGetErrorNumber rssconGetErrorNumber;
+
 };
 
 /**
@@ -250,7 +301,7 @@ bool rssconIsOpen(Rsscon* rsscon);
  *
  * rsscon: The public interface to the rsscon driver.
  * block: set to true to block, false to not to block.
- * returns: true if it was set to wait, false otherwise.
+ * return: true if it was set to wait, false otherwise.
  */
 bool rssconSetBlocking(Rsscon* rsscon, bool block);
 
@@ -258,7 +309,7 @@ bool rssconSetBlocking(Rsscon* rsscon, bool block);
  * Returns if it was set to wait for the device.
  *
  * rsscon: The public interface to the rsscon driver.
- * returns: true if it was set to wait, false otherwise.
+ * return: true if it was set to wait, false otherwise.
  */
 bool rssconGetBlocking(Rsscon* rsscon);
 
@@ -268,7 +319,7 @@ bool rssconGetBlocking(Rsscon* rsscon);
  *
  * rsscon: The public interface to the rsscon driver.
  * wait: set to true to wait, false to not to wait.
- * returns: true upon success, false upon failure.
+ * return: true upon success, false upon failure.
  */
 bool rssconSetWait(Rsscon* rsscon, bool wait);
 
@@ -276,7 +327,7 @@ bool rssconSetWait(Rsscon* rsscon, bool wait);
  * Returns if it was set to wait for the device.
  *
  * rsscon: The public interface to the rsscon driver.
- * returns: true if it was set to wait, false otherwise.
+ * return: true if it was set to wait, false otherwise.
  */
 bool rssconGetWait(Rsscon* rsscon);
 
@@ -298,9 +349,11 @@ unsigned int rssconGetBaudRate(Rsscon* rsscon);
  * Sets the last error caused by accessing the port.
  *
  * rsscon: The public interface to the rsscon driver.
- * lastError: The last error.
+ * lastError: The last error, see the RSSCON_ERROR_* constants.
+ * errorNumber: The system specific error number.
+ * return: true upon success, false upon failure.
  */
-void rssconSetLastError(Rsscon* rsscon, int lastError);
+bool rssconSetLastError(Rsscon* rsscon, int lastError, int errorNumber);
 
 /**
  * Get the last error caused by accessing the port.
@@ -309,5 +362,14 @@ void rssconSetLastError(Rsscon* rsscon, int lastError);
  * return: the code of the last error.
  */
 int rssconGetLastError(Rsscon* rsscon);
+
+/**
+ * Get the system specific error number from the last error caused by
+ * accessing the port.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ * return: the code of the system error.
+ */
+int rssconGetErrorNumber(Rsscon* rsscon);
 
 #endif /* RSSCON_H_ */

@@ -71,6 +71,12 @@ Rsscon* rssconCreate(const char* device, unsigned int baudRate) {
 	rsscon->rssconOpen = NULL;
 	rsscon->rssconRead = NULL;
 	rsscon->rssconWrite = NULL;
+	rsscon->rssconSetBlocking = NULL;
+	rsscon->rssconGetBlocking = NULL;
+	rsscon->rssconSetWait = NULL;
+	rsscon->rssconGetWait = NULL;
+	rsscon->rssconSetErrorNumber = NULL;
+	rsscon->rssconGetErrorNumber = NULL;
 
 	rsscon->portdata = NULL;
 	rsscon->private = private;
@@ -162,11 +168,13 @@ bool rssconGetWait(Rsscon* rsscon) {
 	return rsscon->rssconGetWait(rsscon);
 }
 
-void rssconSetLastError(Rsscon* rsscon, int lastError) {
+bool rssconSetLastError(Rsscon* rsscon, int lastError, int errorNumber) {
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
 	private->lastError = lastError;
+	assert(rsscon->rssconSetErrorNumber != NULL);
+	return rsscon->rssconSetErrorNumber(rsscon, errorNumber);
 }
 
 int rssconGetLastError(Rsscon* rsscon) {
@@ -174,6 +182,13 @@ int rssconGetLastError(Rsscon* rsscon) {
 	assert(rsscon->private != NULL);
 	RssconPrivate* private = (RssconPrivate*) rsscon->private;
 	return private->lastError;
+}
+
+int rssconGetErrorNumber(Rsscon* rsscon) {
+	assert(rsscon != NULL);
+	assert(rsscon->private != NULL);
+	assert(rsscon->rssconGetErrorNumber != NULL);
+	return rsscon->rssconGetErrorNumber(rsscon);
 }
 
 bool rssconIsOpen(Rsscon* rsscon) {

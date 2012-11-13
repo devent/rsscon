@@ -36,6 +36,8 @@
 
 typedef struct {
 
+	int errorNumber;
+
 	bool noblock;
 
 	bool wait;
@@ -91,6 +93,26 @@ static const char * strerrno(int err) {
 #ifdef EBUSY
 	case EBUSY:
 		return "EBUSY";
+#endif
+#ifdef EAGAIN
+	case EAGAIN:
+		return "EAGAIN";
+#endif
+#ifdef EBADMSG
+	case EBADMSG:
+		return "EBADMSG";
+#endif
+#ifdef EINTR
+	case EINTR:
+		return "EINTR";
+#endif
+#ifdef EIO
+	case EIO:
+		return "EIO";
+#endif
+#ifdef EOVERFLOW
+	case EOVERFLOW:
+		return "EOVERFLOW";
 #endif
 	default:
 		return "E??";
@@ -149,7 +171,7 @@ bool rssconlinuxInit(Rsscon* rsscon) {
 	log_enter(log, "rssconlinuxInit");
 	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
 
-	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
+	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR, 0);
 	if (pdata->tvsec < 0) {
 		pdata->tvsec = 5;
 	}
@@ -176,7 +198,7 @@ bool setup(Rsscon* rsscon) {
 	tio2 = &(pdata->newtio);
 
 	if (tcgetattr(pdata->fd, tio1)) {
-		rssconSetLastError(rsscon, RSSCON_ERROR_SETUPDEVICE);
+		rssconSetLastError(rsscon, RSSCON_ERROR_SETUPDEVICE, errno);
 		log_leave(log, "rssconlinuxInit := false");
 		free_log();
 		return false;
@@ -193,7 +215,7 @@ bool setup(Rsscon* rsscon) {
 	tio2->c_cflag |= CREAD | CLOCAL;
 	tcflush(pdata->fd, TCIOFLUSH);
 	if (tcsetattr(pdata->fd, TCSANOW, tio2)) {
-		rssconSetLastError(rsscon, RSSCON_ERROR_SETUPDEVICE);
+		rssconSetLastError(rsscon, RSSCON_ERROR_SETUPDEVICE, errno);
 		log_leave(log, "rssconlinuxInit := false");
 		free_log();
 		return false;
@@ -214,8 +236,7 @@ bool rssconlinuxOpen(Rsscon* rsscon) {
 	log_enter(log, "rssconlinuxOpen");
 	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
 
-	log_debug(log, "set last error to RSSCON_ERROR_NOERROR.");
-	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
+	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR, 0);
 
 	int flag = O_RDWR | O_NOCTTY;
 	if (pdata->noblock) {
@@ -223,12 +244,11 @@ bool rssconlinuxOpen(Rsscon* rsscon) {
 	}
 
 	const char* device = rssconGetDevice(rsscon);
-	log_info(log, "open the device '%s'.", device);
 	log_debug(log, "open device '%s' with flag '%d'.", device, flag);
 	pdata->fd = open(device, flag);
 	if (pdata->fd == -1) {
+		rssconSetLastError(rsscon, RSSCON_ERROR_OPENDEVICE, errno);
 		log_error(log, "error open device '%s': %s", device, strerrno(errno));
-		rssconSetLastError(rsscon, RSSCON_ERROR_OPENDEVICE);
 		log_leave(log, "rssconlinuxOpen := true");
 		free_log();
 		return false;
@@ -237,8 +257,8 @@ bool rssconlinuxOpen(Rsscon* rsscon) {
 	log_debug(log, "setup device '%s' with flag '%d'.", device, flag);
 	bool ret = setup(rsscon);
 	if (!ret) {
+		rssconSetLastError(rsscon, RSSCON_ERROR_OPENDEVICE, errno);
 		log_error(log, "error setup device '%s': %s", device, strerrno(errno));
-		rssconSetLastError(rsscon, RSSCON_ERROR_OPENDEVICE);
 		log_leave(log, "rssconlinuxOpen := true");
 		free_log();
 		return false;
@@ -258,13 +278,15 @@ bool rssconlinuxClose(Rsscon* rsscon) {
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
 	log_enter(log, "rssconlinuxClose");
 
-	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR);
+	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR, 0);
 
 	tcflush(pdata->fd, TCIOFLUSH);
 	tcsetattr(pdata->fd, TCSANOW, &(pdata->oldtio));
 	int ret = close(pdata->fd);
 	if (ret != 0) {
-		rssconSetLastError(rsscon, RSSCON_ERROR_CLOSEDEVICE);
+		rssconSetLastError(rsscon, RSSCON_ERROR_CLOSEDEVICE, errno);
+		const char* device = rssconGetDevice(rsscon);
+		log_error(log, "Error closing device '%s': %s", device, strerrno(errno));
 		log_leave(log, "rssconlinuxClose := false");
 		free_log();
 		return false;
@@ -288,7 +310,9 @@ bool rssconlinuxWrite(Rsscon* rsscon, const void* data, size_t length,
 	ssize_t ret = write(pdata->fd, data, length);
 	tcdrain(pdata->fd);
 	if (ret == -1) {
-		rssconSetLastError(rsscon, RSSCON_ERROR_WRITE);
+		rssconSetLastError(rsscon, RSSCON_ERROR_WRITE, errno);
+		const char* device = rssconGetDevice(rsscon);
+		log_error(log, "error write to device '%s': %s", device, strerrno(errno));
 		log_leave(log, "rssconlinuxWrite := false");
 		free_log();
 		return false;
@@ -326,8 +350,9 @@ bool rssconlinuxRead(Rsscon* rsscon, void* data, size_t length, size_t* readed) 
 	ssize_t ret = 0;
 	if (pdata->wait) {
 		if (!waittodata(pdata, &set, &tv)) {
-			rssconSetLastError(rsscon, RSSCON_ERROR_READ);
-			log_error(log, "Error wait device.");
+			rssconSetLastError(rsscon, RSSCON_ERROR_READ, errno);
+			const char* device = rssconGetDevice(rsscon);
+			log_error(log, "Error wait device '%s': %s", device, strerrno(errno));
 			log_leave(log, "rssconlinuxRead := false");
 			free_log();
 			return false;
@@ -336,20 +361,23 @@ bool rssconlinuxRead(Rsscon* rsscon, void* data, size_t length, size_t* readed) 
 	while (ret == 0) {
 		if (pdata->wait) {
 			if (!waittodata(pdata, &set, &tv)) {
-				rssconSetLastError(rsscon, RSSCON_ERROR_READ);
-				log_error(log, "Error wait device.");
+				rssconSetLastError(rsscon, RSSCON_ERROR_READ, errno);
+				const char* device = rssconGetDevice(rsscon);
+				log_error(log, "Error wait device '%s': %s", device, strerrno(errno));
 				log_leave(log, "rssconlinuxRead := false");
 				free_log();
 				return false;
 			}
 		}
 		ret = read(pdata->fd, data, length);
-		if (ret == -1)
+		if (ret == -1) {
 			break;
+		}
 	}
 	if (ret == -1) {
-		rssconSetLastError(rsscon, RSSCON_ERROR_READ);
-		log_error(log, "Error read device.");
+		rssconSetLastError(rsscon, RSSCON_ERROR_READ, errno);
+		const char* device = rssconGetDevice(rsscon);
+		log_error(log, "Error read from device '%s': %s", device, strerrno(errno));
 		log_leave(log, "rssconlinuxRead := false");
 		free_log();
 		return false;
@@ -365,6 +393,10 @@ bool rssconlinuxRead(Rsscon* rsscon, void* data, size_t length, size_t* readed) 
 bool rssconlinuxSetBlocking(Rsscon* rsscon, bool block) {
 	assert(rsscon != NULL);
 	assert(rsscon->portdata != NULL);
+	if (rssconIsOpen(rsscon)) {
+		rssconSetLastError(rsscon, RSSCON_ERROR_DEVICE_OPENED, 0);
+		return false;
+	}
 	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
 	pdata->noblock = !block;
 	return true;
@@ -380,6 +412,10 @@ bool rssconlinuxGetBlocking(Rsscon* rsscon) {
 bool rssconlinuxSetWait(Rsscon* rsscon, bool wait) {
 	assert(rsscon != NULL);
 	assert(rsscon->portdata != NULL);
+	if (rssconIsOpen(rsscon)) {
+		rssconSetLastError(rsscon, RSSCON_ERROR_DEVICE_OPENED, 0);
+		return false;
+	}
 	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
 	pdata->wait = wait;
 	return true;
@@ -390,6 +426,21 @@ bool rssconlinuxGetWait(Rsscon* rsscon) {
 	assert(rsscon->portdata != NULL);
 	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
 	return !pdata->wait;
+}
+
+bool rssconlinuxSetErrorNumber(Rsscon* rsscon, int errorNumber) {
+	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
+	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
+	pdata->errorNumber = errorNumber;
+	return true;
+}
+
+int rssconlinuxGetErrorNumber(Rsscon* rsscon) {
+	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
+	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
+	return pdata->errorNumber;
 }
 
 bool rssconInit(Rsscon* rsscon) {
@@ -408,6 +459,8 @@ bool rssconInit(Rsscon* rsscon) {
 	rsscon->rssconGetBlocking = rssconlinuxGetBlocking;
 	rsscon->rssconSetWait = rssconlinuxSetWait;
 	rsscon->rssconGetWait = rssconlinuxGetWait;
+	rsscon->rssconSetErrorNumber = rssconlinuxSetErrorNumber;
+	rsscon->rssconGetErrorNumber = rssconlinuxGetErrorNumber;
 
 	log_leave(log, "rssconInit");
 	free_log();
