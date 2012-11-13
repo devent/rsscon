@@ -23,6 +23,7 @@ import org.junit.Before
 import org.junit.Test
 
 import com.anrisoftware.rsscon.api.BaudRate
+import com.anrisoftware.rsscon.utils.RssconTestUtils;
 import com.anrisoftware.rsscon.utils.VirtualTtyEnvironment
 
 /**

@@ -1,4 +1,4 @@
-package com.anrisoftware.rsscon.nativeimpl
+package com.anrisoftware.rsscon.utils
 
 import org.junit.BeforeClass
 import org.slf4j.LoggerFactory
@@ -7,6 +7,7 @@ import com.anrisoftware.propertiesutils.ContextProperties
 import com.anrisoftware.rsscon.api.NativeRssconInputStreamFactory
 import com.anrisoftware.rsscon.api.NativeRssconOutputStreamFactory
 import com.anrisoftware.rsscon.api.RssconNativeFactory
+import com.anrisoftware.rsscon.nativeimpl.NativeRssconModule;
 import com.google.inject.Guice
 import com.google.inject.Injector
 
