@@ -1,7 +1,5 @@
 package com.anrisoftware.rsscon.nativeimpl
 
-import org.junit.After
-import org.junit.Before
 import org.junit.BeforeClass
 import org.slf4j.LoggerFactory
 
@@ -9,7 +7,6 @@ import com.anrisoftware.propertiesutils.ContextProperties
 import com.anrisoftware.rsscon.api.NativeRssconInputStreamFactory
 import com.anrisoftware.rsscon.api.NativeRssconOutputStreamFactory
 import com.anrisoftware.rsscon.api.RssconNativeFactory
-import com.anrisoftware.rsscon.utils.VirtualTtyEnvironment
 import com.google.inject.Guice
 import com.google.inject.Injector
 
@@ -44,8 +41,6 @@ class RssconTestUtils {
 
 	static RssconNativeFactory nativeFactory
 
-	VirtualTtyEnvironment environment
-
 	@BeforeClass
 	static void checkDeviceAvailable() {
 		def log = LoggerFactory.getLogger(RssconTestUtils)
@@ -69,15 +64,5 @@ class RssconTestUtils {
 
 	static Injector createInjector() {
 		Guice.createInjector(new NativeRssconModule())
-	}
-
-	@Before
-	void startVirtualCom() {
-		environment = new VirtualTtyEnvironment().startSocat()
-	}
-
-	@After
-	void stopVirtualCom() {
-		environment.stopSocat()
 	}
 }

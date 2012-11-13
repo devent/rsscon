@@ -18,6 +18,8 @@
  */
 package com.anrisoftware.rsscon.nativeimpl
 
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
 import com.anrisoftware.rsscon.api.BaudRate
@@ -29,7 +31,9 @@ import com.anrisoftware.rsscon.utils.VirtualTtyEnvironment
  * @author Erwin Mueller, erwin.mueller@deventm.org
  * @since 1.0
  */
-class WriteToRssconDevice extends RssconTestUtils {
+class WriteToRssconDeviceTest extends RssconTestUtils {
+
+	VirtualTtyEnvironment environment
 
 	@Test
 	void "Write one byte"() {
@@ -39,5 +43,15 @@ class WriteToRssconDevice extends RssconTestUtils {
 		def stream = outputFactory.create rsscon
 		stream.write 'something something something'.getBytes()
 		stream.close()
+	}
+
+	@Before
+	void startVirtualCom() {
+		environment = new VirtualTtyEnvironment().startSocat()
+	}
+
+	@After
+	void stopVirtualCom() {
+		environment.stopSocat()
 	}
 }
