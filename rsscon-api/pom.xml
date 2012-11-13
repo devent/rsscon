@@ -6,14 +6,14 @@
 	<parent>
 		<groupId>com.anrisoftware.rsscon</groupId>
 		<artifactId>rsscon-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1.0</version>
 		<relativePath>../rsscon-parent</relativePath>
 	</parent>
 
 	<artifactId>rsscon-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Rsscon :: API</name>
-	<description>Read and write data to a RS-232 (serial) device.</description>
+	<description>API for reading and writing data to RS-232 (serial) devices.</description>
 	<inceptionYear>2012</inceptionYear>
 
 	<dependencies>
