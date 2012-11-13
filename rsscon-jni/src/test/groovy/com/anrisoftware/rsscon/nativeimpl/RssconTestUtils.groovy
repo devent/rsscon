@@ -2,11 +2,12 @@ package com.anrisoftware.rsscon.nativeimpl
 
 import org.junit.Before
 import org.junit.BeforeClass
+import org.slf4j.LoggerFactory
 
+import com.anrisoftware.propertiesutils.ContextProperties
 import com.anrisoftware.rsscon.api.NativeRssconInputStreamFactory
 import com.anrisoftware.rsscon.api.NativeRssconOutputStreamFactory
 import com.anrisoftware.rsscon.api.RssconNativeFactory
-import com.anrisoftware.rsscon.nativeimpl.NativeRssconModule;
 import com.anrisoftware.rsscon.utils.VirtualTtyEnvironment
 import com.google.inject.Guice
 import com.google.inject.Injector
@@ -19,6 +20,21 @@ import com.google.inject.Injector
  */
 class RssconTestUtils {
 
+	/**
+	 * The device path.
+	 */
+	static String devicePath
+
+	/**
+	 * If the device is available.
+	 */
+	static boolean deviceAvailable
+
+	/**
+	 * Some device paths.
+	 */
+	static devicePaths = ["/dev/ttyUSB0"]
+
 	static Injector injector
 
 	static NativeRssconInputStreamFactory inputFactory
@@ -28,6 +44,19 @@ class RssconTestUtils {
 	static RssconNativeFactory nativeFactory
 
 	VirtualTtyEnvironment environment
+
+	@BeforeClass
+	static void checkDeviceAvailable() {
+		def log = LoggerFactory.getLogger(RssconTestUtils)
+		def p = new ContextProperties(this, System.properties)
+		deviceAvailable = p.getBooleanProperty("rsscon_available", false)
+		devicePath = p.getProperty("rsscon_path", devicePaths[0])
+		if (!deviceAvailable) {
+			log.warn "Rsscon device is not available for testing."
+		} else {
+			log.debug "Rsscon device available for testing with path {}.", devicePaths
+		}
+	}
 
 	@BeforeClass
 	static void createFactories() {
