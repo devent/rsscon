@@ -71,7 +71,8 @@ void cleanupUnless(bool expression, Rsscon* rsscon) {
 
 bool readDataSensorBlock(Rsscon* rsscon) {
 	size_t sensorCount = 16;
-	size_t size = sensorCount * 3;
+	size_t byteSizeSensor = 3;
+	size_t size = sensorCount * byteSizeSensor;
 	char data[size];
 	size_t readBytes;
 
@@ -81,12 +82,12 @@ bool readDataSensorBlock(Rsscon* rsscon) {
 		printRssconError(rsscon);
 		return false;
 	}
-	int k;
+	size_t k, m;
 	for (k = 0; k < sensorCount; ++k) {
-		char intData[3];
-		memcpy(intData, &data[k * 3], sizeof(intData));
-		int value = *(int *) intData;
-		printf("%d ", value);
+		for (m = 0; m < byteSizeSensor; ++m) {
+			printf("%00hhx", data[m + k*m]);
+		}
+		printf(" ");
 	}
 	printf("\n");
 	return true;
@@ -130,7 +131,7 @@ bool readData(Rsscon* rsscon) {
 
 int main() {
 #ifdef __linux
-	const char* device = "/dev/ttyUSB0";
+	const char* device = "/dev/ttyUSB3";
 #endif
 #ifdef RSSCON_WINDOWS
 	const char* device = "COM:5";
@@ -149,6 +150,9 @@ int main() {
 	printRssconError(rsscon);
 	cleanupUnless(ret, rsscon);
 	exitUnless(ret);
+
+	ret = rssconSetBlocking(rsscon, true);
+	ret = rssconSetWait(rsscon, false);
 
 	log_info(log, "open rsscon");
 	ret = rssconOpen(rsscon);
