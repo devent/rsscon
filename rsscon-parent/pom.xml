@@ -5,8 +5,8 @@
 
 	<parent>
 		<groupId>com.anrisoftware.globalpom</groupId>
-		<artifactId>globalpom-parent</artifactId>
-		<version>1.24-SNAPSHOT</version>
+		<artifactId>globalpom-groovy</artifactId>
+		<version>1.13</version>
 		<relativePath />
 	</parent>
 
@@ -14,7 +14,7 @@
 	<artifactId>rsscon-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>Rsscon :: Parent</name>
+	<name>Rsscon :: Parent POM</name>
 	<description>Manages meta-information and dependencies for the Rsscon project.</description>
 	<inceptionYear>2012</inceptionYear>
 
@@ -48,5 +48,22 @@
 		<developerConnection>scm:git:${custom.gitpublic.url}rsscon.git</developerConnection>
 		<url>scm:git:${custom.gitpublic.url}rsscon.git</url>
 	</scm>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<!-- LGPL3 -->
+				<groupId>com.anrisoftware.globalpom</groupId>
+				<artifactId>globalpom-log</artifactId>
+				<version>1.5</version>
+			</dependency>
+			<dependency>
+				<!-- Apache License 2.0 -->
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-exec</artifactId>
+				<version>1.1</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 </project>
