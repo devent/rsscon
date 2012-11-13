@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.anrisoftware.rsscon</groupId>
 		<artifactId>rsscon-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1.0</version>
 		<relativePath>../rsscon-parent</relativePath>
 	</parent>
 
@@ -37,18 +37,6 @@
 							</sysLib>
 						</sysLibs>
 					</linker>
-					<c>
-					</c>
-					<sourceDirectory>main/src/c</sourceDirectory>
-					<includes>
-						<include>main/src/include</include>
-					</includes>
-					<excludes>
-						<exclude>*.mk</exclude>
-						<exclude>*.o</exclude>
-						<exclude>*.d</exclude>
-						<exclude>makefile</exclude>
-					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>
