@@ -55,11 +55,11 @@ typedef bool (*RssconOpen)(Rsscon*);
 
 typedef bool (*RssconClose)(Rsscon*);
 
-typedef bool (*RssconSetBlocking)(Rsscon*, bool block);
+typedef bool (*RssconSetBlocking)(Rsscon*, bool);
 
 typedef bool (*RssconGetBlocking)(Rsscon*);
 
-typedef bool (*RssconSetWait)(Rsscon*, bool wait);
+typedef bool (*RssconSetWait)(Rsscon*, bool);
 
 typedef bool (*RssconGetWait)(Rsscon*);
 
@@ -82,24 +82,94 @@ struct Rsscon {
 	 */
 	void* private;
 
+	/**
+	 * Initialize the private data.
+	 *
+	 * (Rsscon*): the Rsscon data structure.
+	 * returns bool: true uppon success, false uppon failure.
+	 */
 	RssconInit rssconInit;
 
+	/**
+	 * Frees the private data.
+	 *
+	 * (Rsscon*): the Rsscon data structure.
+	 * returns bool: true uppon success, false uppon failure.
+	 */
 	RssconFree rssconFree;
 
+	/**
+	 * Opens the serial port for read and write.
+	 *
+	 * (Rsscon*): the Rsscon data structure.
+	 * returns bool: true uppon success, false uppon failure.
+	 */
 	RssconOpen rssconOpen;
 
+	/**
+	 * Closes the serial port.
+	 *
+	 * (Rsscon*): the Rsscon data structure.
+	 * returns bool: true uppon success, false uppon failure.
+	 */
 	RssconClose rssconClose;
 
+	/**
+	 * Writes data to the serial port.
+	 *
+	 * (Rsscon*): the Rsscon data structure.
+	 * const void*: the data to write.
+	 * size_t: the size of the data.
+	 * size_t*: will be set to how much data was written.
+	 * returns bool: true uppon success, false uppon failure.
+	 */
 	RssconWrite rssconWrite;
 
+	/**
+	 * Reads data from the serial port.
+	 *
+	 * (Rsscon*): the Rsscon data structure.
+	 * void*: the pointer to where to write the data.
+	 * size_t: how much data to read.
+	 * size_t*: will be set to how much data was red.
+	 * returns bool: true uppon success, false uppon failure.
+	 */
 	RssconRead rssconRead;
 
+	/**
+	 * Sets whether the read and write access should block.
+	 * Defaults to false.
+	 *
+	 * (Rsscon*): the Rsscon data structure.
+	 * bool: set to true to block, false to not to block.
+	 * returns bool: true uppon success, false uppon failure.
+	 */
 	RssconSetBlocking rssconSetBlocking;
 
+	/**
+	 * Returns if it was set to wait for the device.
+	 *
+	 * (Rsscon*): the Rsscon data structure.
+	 * returns bool: true if it was set to wait, false otherwise.
+	 */
 	RssconGetBlocking rssconGetBlocking;
 
+	/**
+	 * Sets whether to wait for the device.
+	 * Defaults to false.
+	 *
+	 * (Rsscon*): the Rsscon data structure.
+	 * bool: set to true to wait, false to not to wait.
+	 * returns bool: true uppon success, false uppon failure.
+	 */
 	RssconSetWait rssconSetWait;
 
+	/**
+	 * Returns if it was set to wait for the device.
+	 *
+	 * (Rsscon*): the Rsscon data structure.
+	 * returns bool: true if it was set to wait, false otherwise.
+	 */
 	RssconGetWait rssconGetWait;
 
 };
