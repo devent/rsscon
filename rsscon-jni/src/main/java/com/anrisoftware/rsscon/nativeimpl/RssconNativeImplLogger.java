@@ -42,11 +42,11 @@ class RssconNativeImplLogger extends AbstractLogger {
 	}
 
 	void closeRsscon(RssconNativeImpl rsscon) {
-		log.trace("Close {}.", rsscon);
+		log.debug("Close {}.", rsscon);
 	}
 
 	void openDevice(RssconNativeImpl rsscon) {
-		log.trace("Open {}.", rsscon);
+		log.debug("Open {}.", rsscon);
 	}
 
 	void writeBuffer(RssconNativeImpl rsscon, byte[] data) {
@@ -62,8 +62,8 @@ class RssconNativeImplLogger extends AbstractLogger {
 
 	void readBuffer(RssconNativeImpl rsscon, byte[] data, int bytes) {
 		if (log.isTraceEnabled()) {
-			log.trace("Write buffer ({} bytes) {} to {}.", new Object[] {
-					bytes, toHexString(data, bytes), rsscon });
+			log.trace("Read data ({} bytes) {} to {}.", new Object[] { bytes,
+					toHexString(data, bytes), rsscon });
 		}
 	}
 

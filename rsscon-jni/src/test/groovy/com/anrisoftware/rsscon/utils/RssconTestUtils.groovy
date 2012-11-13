@@ -7,7 +7,7 @@ import com.anrisoftware.propertiesutils.ContextProperties
 import com.anrisoftware.rsscon.api.NativeRssconInputStreamFactory
 import com.anrisoftware.rsscon.api.NativeRssconOutputStreamFactory
 import com.anrisoftware.rsscon.api.RssconNativeFactory
-import com.anrisoftware.rsscon.nativeimpl.NativeRssconModule;
+import com.anrisoftware.rsscon.nativeimpl.NativeRssconModule
 import com.google.inject.Guice
 import com.google.inject.Injector
 
@@ -18,6 +18,11 @@ import com.google.inject.Injector
  * @since 1.0
  */
 class RssconTestUtils {
+
+	/*
+	 * -Dcom.anrisoftware.rsscon.utils.rsscon_available = true
+	 * -Dcom.anrisoftware.rsscon.utils.rsscon_path = /dev/ttyUSB0
+	 */
 
 	/**
 	 * The device path.
@@ -45,7 +50,7 @@ class RssconTestUtils {
 	@BeforeClass
 	static void checkDeviceAvailable() {
 		def log = LoggerFactory.getLogger(RssconTestUtils)
-		def p = new ContextProperties(this, System.properties)
+		def p = new ContextProperties(RssconTestUtils, System.properties)
 		deviceAvailable = p.getBooleanProperty("rsscon_available", false)
 		devicePath = p.getProperty("rsscon_path", devicePaths[0])
 		if (!deviceAvailable) {
