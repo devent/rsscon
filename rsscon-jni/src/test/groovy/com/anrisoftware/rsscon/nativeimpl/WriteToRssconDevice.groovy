@@ -33,11 +33,11 @@ class WriteToRssconDevice extends RssconTestUtils {
 
 	@Test
 	void "Write one byte"() {
-		def device = '/dev/pts/4'
+		def device = environment.virtualDevices[0]
 		def baudRate = BaudRate.BAUDRATE_921600
 		def rsscon = nativeFactory.create device, baudRate
 		def stream = outputFactory.create rsscon
-		stream.write 'something'.getBytes()[0]
+		stream.write 'something something something'.getBytes()
 		stream.close()
 	}
 }

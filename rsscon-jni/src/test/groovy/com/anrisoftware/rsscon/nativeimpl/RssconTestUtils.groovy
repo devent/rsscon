@@ -1,5 +1,6 @@
 package com.anrisoftware.rsscon.nativeimpl
 
+import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
 import org.slf4j.LoggerFactory
@@ -73,5 +74,10 @@ class RssconTestUtils {
 	@Before
 	void startVirtualCom() {
 		environment = new VirtualTtyEnvironment().startSocat()
+	}
+
+	@After
+	void stopVirtualCom() {
+		environment.stopSocat()
 	}
 }

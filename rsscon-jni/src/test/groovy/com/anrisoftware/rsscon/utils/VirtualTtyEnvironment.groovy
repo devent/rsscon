@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2011 Erwin Mueller <erwin.mueller@deventm.org>
  *
@@ -18,11 +19,16 @@
  */
 package com.anrisoftware.rsscon.utils
 
+import groovy.util.logging.Slf4j
+
+import java.util.regex.Pattern
+
 import org.apache.commons.exec.CommandLine
 import org.apache.commons.exec.DefaultExecutor
 import org.apache.commons.exec.ExecuteResultHandler
 import org.apache.commons.exec.ExecuteWatchdog
 import org.apache.commons.exec.PumpStreamHandler
+import org.apache.commons.lang3.StringUtils
 
 /**
  * Starts the {@code socat} command to create a virtual serial port.
@@ -30,28 +36,47 @@ import org.apache.commons.exec.PumpStreamHandler
  * @author Erwin Mueller, erwin.mueller@deventm.org
  * @since 1.0
  */
+@Slf4j
 class VirtualTtyEnvironment {
+
+	static final Pattern ptsPattern = Pattern.compile(".*(/dev/pts/\\d+)")
 
 	DefaultExecutor executor
 
 	ByteArrayOutputStream output
 
+	def virtualDevices = []
+
 	VirtualTtyEnvironment startSocat() {
 		output = new ByteArrayOutputStream()
-		def cmdline = new CommandLine("socat")
-		cmdline.addArgument "-d"
-		cmdline.addArgument "-d"
-		cmdline.addArgument "PTY PTY", false
+		def cmdline = CommandLine.parse("socat -d -d pty pty")
 		executor = new DefaultExecutor()
 		executor.watchdog = new ExecuteWatchdog(60 * 1000)
 		executor.streamHandler = new PumpStreamHandler(output)
 		executor.execute cmdline, [
-			onProcessComplete: { exitValue -> },
+			onProcessComplete: { exitValue ->
+				def outputString = output.toString()
+				log.info outputString
+			},
 			onProcessFailed: { e ->
+				def outputString = output.toString()
+				log.error outputString
+				e.printStackTrace()
 			}
 		] as ExecuteResultHandler
+		Thread.sleep 200
 		def outputString = output.toString()
-		println outputString
+		def outputSplit = StringUtils.split(outputString, "\n")
+		outputSplit.each {
+			def matcher = ptsPattern.matcher(outputSplit[0])
+			matcher.find()
+			virtualDevices << matcher.group(1)
+		}
+		log.info "Virtual devices are {}", virtualDevices
 		this
+	}
+
+	void stopSocat() {
+		executor.watchdog.destroyProcess()
 	}
 }

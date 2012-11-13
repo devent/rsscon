@@ -58,6 +58,18 @@
 				<version>1.5</version>
 			</dependency>
 			<dependency>
+				<!-- LGPL3 -->
+				<groupId>com.anrisoftware.propertiesutils</groupId>
+				<artifactId>propertiesutils-contextproperties</artifactId>
+				<version>1.2</version>
+			</dependency>
+			<dependency>
+				<!-- LGPL3 -->
+				<groupId>com.anrisoftware.globalpom</groupId>
+				<artifactId>globalpom-groovytestutils</artifactId>
+				<version>1.9</version>
+			</dependency>
+			<dependency>
 				<!-- Apache License 2.0 -->
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-exec</artifactId>
