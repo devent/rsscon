@@ -32,6 +32,8 @@ import com.anrisoftware.globalpom.log.AbstractLogger;
  */
 class RssconNativeImplLogger extends AbstractLogger {
 
+	private static final int MAX_BUFFER_OUTPUT = 16;
+
 	/**
 	 * Create logger for {@link RssconInputStream}.
 	 */
@@ -49,7 +51,8 @@ class RssconNativeImplLogger extends AbstractLogger {
 
 	void writeBuffer(RssconNativeImpl rsscon, byte[] data) {
 		if (log.isTraceEnabled()) {
-			log.trace("Write buffer {} to {}.", toHexString(data), rsscon);
+			log.trace("Write buffer ({} bytes) {} to {}.", new Object[] {
+					data.length, toHexString(data), rsscon });
 		}
 	}
 
@@ -59,17 +62,21 @@ class RssconNativeImplLogger extends AbstractLogger {
 
 	void readBuffer(RssconNativeImpl rsscon, byte[] data, int bytes) {
 		if (log.isTraceEnabled()) {
-			log.trace("Write buffer {} to {}.", toHexString(data, bytes),
-					rsscon);
+			log.trace("Write buffer ({} bytes) {} to {}.", new Object[] {
+					bytes, toHexString(data, bytes), rsscon });
 		}
 	}
 
 	private String toHexString(byte[] array, int bytes) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		PrintWriter writer = new PrintWriter(new OutputStreamWriter(out));
-		for (int i = 0; i < bytes; i++) {
-			writer.printf("%2x", array[i]);
+		for (int i = 0; i < Math.min(bytes, 32); i++) {
+			writer.printf("0x%2x", array[i]);
 		}
+		if (bytes > MAX_BUFFER_OUTPUT) {
+			writer.append("...");
+		}
+		writer.flush();
 		return out.toString();
 	}
 
