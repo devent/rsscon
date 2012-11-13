@@ -55,6 +55,14 @@ typedef bool (*RssconOpen)(Rsscon*);
 
 typedef bool (*RssconClose)(Rsscon*);
 
+typedef bool (*RssconSetBlocking)(Rsscon*, bool block);
+
+typedef bool (*RssconGetBlocking)(Rsscon*);
+
+typedef bool (*RssconSetWait)(Rsscon*, bool wait);
+
+typedef bool (*RssconGetWait)(Rsscon*);
+
 typedef bool (*RssconWrite)(Rsscon*, const void*, size_t, size_t*);
 
 typedef bool (*RssconRead)(Rsscon*, void*, size_t, size_t*);
@@ -85,6 +93,14 @@ struct Rsscon {
 	RssconWrite rssconWrite;
 
 	RssconRead rssconRead;
+
+	RssconSetBlocking rssconSetBlocking;
+
+	RssconGetBlocking rssconGetBlocking;
+
+	RssconSetWait rssconSetWait;
+
+	RssconGetWait rssconGetWait;
 
 };
 
