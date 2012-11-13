@@ -138,6 +138,30 @@ bool rssconRead(Rsscon* rsscon, void* data, size_t length, size_t* red) {
 	return rsscon->rssconRead(rsscon, data, length, red);
 }
 
+bool rssconSetBlocking(Rsscon* rsscon, bool blocking) {
+	assert(rsscon != NULL);
+	assert(rsscon->rssconSetBlocking != NULL);
+	return rsscon->rssconSetBlocking(rsscon, blocking);
+}
+
+bool rssconGetBlocking(Rsscon* rsscon) {
+	assert(rsscon != NULL);
+	assert(rsscon->rssconGetBlocking != NULL);
+	return rsscon->rssconGetBlocking(rsscon);
+}
+
+bool rssconSetWait(Rsscon* rsscon, bool wait) {
+	assert(rsscon != NULL);
+	assert(rsscon->rssconSetWait != NULL);
+	return rsscon->rssconSetWait(rsscon, wait);
+}
+
+bool rssconGetWait(Rsscon* rsscon) {
+	assert(rsscon != NULL);
+	assert(rsscon->rssconGetWait != NULL);
+	return rsscon->rssconGetWait(rsscon);
+}
+
 void rssconSetLastError(Rsscon* rsscon, int lastError) {
 	assert(rsscon != NULL);
 	assert(rsscon->private != NULL);

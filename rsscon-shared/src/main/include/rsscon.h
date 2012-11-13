@@ -86,7 +86,7 @@ struct Rsscon {
 	 * Initialize the private data.
 	 *
 	 * (Rsscon*): the Rsscon data structure.
-	 * returns bool: true uppon success, false uppon failure.
+	 * returns bool: true upon success, false upon failure.
 	 */
 	RssconInit rssconInit;
 
@@ -94,7 +94,7 @@ struct Rsscon {
 	 * Frees the private data.
 	 *
 	 * (Rsscon*): the Rsscon data structure.
-	 * returns bool: true uppon success, false uppon failure.
+	 * returns bool: true upon success, false upon failure.
 	 */
 	RssconFree rssconFree;
 
@@ -102,7 +102,7 @@ struct Rsscon {
 	 * Opens the serial port for read and write.
 	 *
 	 * (Rsscon*): the Rsscon data structure.
-	 * returns bool: true uppon success, false uppon failure.
+	 * returns bool: true upon success, false upon failure.
 	 */
 	RssconOpen rssconOpen;
 
@@ -110,7 +110,7 @@ struct Rsscon {
 	 * Closes the serial port.
 	 *
 	 * (Rsscon*): the Rsscon data structure.
-	 * returns bool: true uppon success, false uppon failure.
+	 * returns bool: true upon success, false upon failure.
 	 */
 	RssconClose rssconClose;
 
@@ -121,7 +121,7 @@ struct Rsscon {
 	 * const void*: the data to write.
 	 * size_t: the size of the data.
 	 * size_t*: will be set to how much data was written.
-	 * returns bool: true uppon success, false uppon failure.
+	 * returns bool: true upon success, false upon failure.
 	 */
 	RssconWrite rssconWrite;
 
@@ -132,7 +132,7 @@ struct Rsscon {
 	 * void*: the pointer to where to write the data.
 	 * size_t: how much data to read.
 	 * size_t*: will be set to how much data was red.
-	 * returns bool: true uppon success, false uppon failure.
+	 * returns bool: true upon success, false upon failure.
 	 */
 	RssconRead rssconRead;
 
@@ -142,7 +142,7 @@ struct Rsscon {
 	 *
 	 * (Rsscon*): the Rsscon data structure.
 	 * bool: set to true to block, false to not to block.
-	 * returns bool: true uppon success, false uppon failure.
+	 * returns bool: true upon success, false upon failure.
 	 */
 	RssconSetBlocking rssconSetBlocking;
 
@@ -160,7 +160,7 @@ struct Rsscon {
 	 *
 	 * (Rsscon*): the Rsscon data structure.
 	 * bool: set to true to wait, false to not to wait.
-	 * returns bool: true uppon success, false uppon failure.
+	 * returns bool: true upon success, false upon failure.
 	 */
 	RssconSetWait rssconSetWait;
 
@@ -243,6 +243,42 @@ bool rssconRead(Rsscon* rsscon, void* data, size_t length, size_t* red);
  * return: True when the port is open and ready to read/write, False otherwise.
  */
 bool rssconIsOpen(Rsscon* rsscon);
+
+/**
+ * Sets whether the read and write access should block.
+ * Defaults to false.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ * block: set to true to block, false to not to block.
+ * returns: true if it was set to wait, false otherwise.
+ */
+bool rssconSetBlocking(Rsscon* rsscon, bool block);
+
+/**
+ * Returns if it was set to wait for the device.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ * returns: true if it was set to wait, false otherwise.
+ */
+bool rssconGetBlocking(Rsscon* rsscon);
+
+/**
+ * Sets whether to wait for the device.
+ * Defaults to false.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ * wait: set to true to wait, false to not to wait.
+ * returns: true upon success, false upon failure.
+ */
+bool rssconSetWait(Rsscon* rsscon, bool wait);
+
+/**
+ * Returns if it was set to wait for the device.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ * returns: true if it was set to wait, false otherwise.
+ */
+bool rssconGetWait(Rsscon* rsscon);
 
 /**
  * Returns the device name that we read and write data to and from.

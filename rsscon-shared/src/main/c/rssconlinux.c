@@ -362,6 +362,36 @@ bool rssconlinuxRead(Rsscon* rsscon, void* data, size_t length, size_t* readed) 
 	return true;
 }
 
+bool rssconlinuxSetBlocking(Rsscon* rsscon, bool block) {
+	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
+	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
+	pdata->noblock = !block;
+	return true;
+}
+
+bool rssconlinuxGetBlocking(Rsscon* rsscon) {
+	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
+	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
+	return !pdata->noblock;
+}
+
+bool rssconlinuxSetWait(Rsscon* rsscon, bool wait) {
+	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
+	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
+	pdata->wait = wait;
+	return true;
+}
+
+bool rssconlinuxGetWait(Rsscon* rsscon) {
+	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
+	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
+	return !pdata->wait;
+}
+
 bool rssconInit(Rsscon* rsscon) {
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
 	log_enter(log, "rssconInit");
@@ -374,6 +404,10 @@ bool rssconInit(Rsscon* rsscon) {
 	rsscon->rssconClose = rssconlinuxClose;
 	rsscon->rssconWrite = rssconlinuxWrite;
 	rsscon->rssconRead = rssconlinuxRead;
+	rsscon->rssconSetBlocking = rssconlinuxSetBlocking;
+	rsscon->rssconGetBlocking = rssconlinuxGetBlocking;
+	rsscon->rssconSetWait = rssconlinuxSetWait;
+	rsscon->rssconGetWait = rssconlinuxGetWait;
 
 	log_leave(log, "rssconInit");
 	free_log();
