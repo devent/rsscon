@@ -18,6 +18,15 @@
 	<inceptionYear>2012</inceptionYear>
 
 	<dependencies>
+
+		<!-- test dependencies -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-exec</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- own modules dependencies -->
 		<dependency>
 			<groupId>com.anrisoftware.rsscon</groupId>
 			<artifactId>rsscon-shared</artifactId>
@@ -29,6 +38,8 @@
 			<artifactId>rsscon-api</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+
+		<!-- compile dependencies -->
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-assistedinject</artifactId>
@@ -36,10 +47,6 @@
 		<dependency>
 			<groupId>com.anrisoftware.globalpom</groupId>
 			<artifactId>globalpom-log</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-exec</artifactId>
 		</dependency>
 	</dependencies>
 
