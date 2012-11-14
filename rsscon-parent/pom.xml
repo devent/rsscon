@@ -12,7 +12,7 @@
 
 	<groupId>com.anrisoftware.rsscon</groupId>
 	<artifactId>rsscon-parent</artifactId>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Rsscon :: Parent POM</name>
 	<description>Manages meta-information and dependencies for the Rsscon project.</description>
