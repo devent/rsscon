@@ -80,4 +80,8 @@ class RssconNativeImplLogger extends AbstractLogger {
 		return out.toString();
 	}
 
+	void blockingSet(RssconNativeImpl rsscon, boolean block) {
+		log.trace("Set blocking to {} for {}.", block, rsscon);
+	}
+
 }

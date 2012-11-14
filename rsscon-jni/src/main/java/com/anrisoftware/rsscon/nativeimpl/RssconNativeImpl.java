@@ -51,6 +51,10 @@ class RssconNativeImpl implements RssconNative {
 
 	private long reference;
 
+	private boolean block;
+
+	private boolean wait;
+
 	@Inject
 	RssconNativeImpl(RssconNativeImplLogger logger, @Assisted String device,
 			@Assisted BaudRate baudRate) {
@@ -70,6 +74,18 @@ class RssconNativeImpl implements RssconNative {
 		this.reference = reference;
 	}
 
+	@Override
+	public void setBlocking(boolean block) throws IOException {
+		log.blockingSet(this, block);
+		this.block = block;
+	}
+
+	@Override
+	public void setWait(boolean wait) throws IOException {
+		log.blockingSet(this, wait);
+		this.wait = wait;
+	}
+
 	public void close() throws IOException {
 		if (!isOpen()) {
 			return;
@@ -85,6 +101,8 @@ class RssconNativeImpl implements RssconNative {
 		long reference = rssconCreate(device, baudRate.getBoudRate());
 		setReference(reference);
 		rssconInit(reference);
+		rssconSetBlocking(reference, block);
+		rssconSetWait(reference, wait);
 		rssconOpen(reference);
 		open = true;
 	}

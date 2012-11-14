@@ -1,8 +1,11 @@
 package com.anrisoftware.rsscon.utils
 
+import static com.anrisoftware.globalpom.utils.TestUtils.*
+
 import org.junit.BeforeClass
 import org.slf4j.LoggerFactory
 
+import com.anrisoftware.globalpom.utils.TestUtils
 import com.anrisoftware.propertiesutils.ContextProperties
 import com.anrisoftware.rsscon.api.NativeRssconInputStreamFactory
 import com.anrisoftware.rsscon.api.NativeRssconOutputStreamFactory
@@ -22,6 +25,8 @@ class RssconTestUtils {
 	/*
 	 * -Dcom.anrisoftware.rsscon.utils.rsscon_available = true
 	 * -Dcom.anrisoftware.rsscon.utils.rsscon_path = /dev/ttyUSB0
+	 * LD_LIBRARY_PATH
+	 * ${rsscon_jni_ldpath}
 	 */
 
 	/**
@@ -46,6 +51,11 @@ class RssconTestUtils {
 	static NativeRssconOutputStreamFactory outputFactory
 
 	static RssconNativeFactory nativeFactory
+
+	@BeforeClass
+	static void setupToStringStyle() {
+		TestUtils.toStringStyle
+	}
 
 	@BeforeClass
 	static void checkDeviceAvailable() {

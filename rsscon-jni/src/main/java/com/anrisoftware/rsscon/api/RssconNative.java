@@ -18,6 +18,8 @@
  */
 package com.anrisoftware.rsscon.api;
 
+import java.io.IOException;
+
 /**
  * Manage the reference to the native device library.
  * 
@@ -40,4 +42,26 @@ public interface RssconNative {
 	 *            the reference.
 	 */
 	void setReference(long reference);
+
+	/**
+	 * Sets whether the read and write access should block. Defaults to false.
+	 * 
+	 * @param block
+	 *            set to {@code true} to block, {@code false} to not block.
+	 * 
+	 * @throws IOException
+	 *             if there was error set blocking.
+	 */
+	void setBlocking(boolean block) throws IOException;
+
+	/**
+	 * Sets whether to wait for the device. Defaults to false.
+	 * 
+	 * @param wait
+	 *            set to {@code true} to wait, {@code false} to not wait.
+	 * 
+	 * @throws IOException
+	 *             if there was error set wait.
+	 */
+	void setWait(boolean wait) throws IOException;
 }

@@ -20,7 +20,9 @@ package com.anrisoftware.rsscon.nativeimpl
 
 import org.junit.Test
 
+import com.anrisoftware.globalpom.utils.TestUtils
 import com.anrisoftware.rsscon.api.BaudRate
+import com.anrisoftware.rsscon.api.RssconIOException
 import com.anrisoftware.rsscon.utils.RssconTestUtils
 
 /**
@@ -50,7 +52,7 @@ class RssconKeypenDeviceTest extends RssconTestUtils {
 	]
 
 	@Test
-	void "write start and read data"() {
+	void "write start and read data no block no wait"() {
 		if (!deviceAvailable) {
 			return
 		}
@@ -58,6 +60,49 @@ class RssconKeypenDeviceTest extends RssconTestUtils {
 		def device = devicePath
 		def baudRate = BaudRate.BAUDRATE_921600
 		def rsscon = nativeFactory.create device, baudRate
+		def outputStream = outputFactory.create rsscon
+		def inputStream = inputFactory.create rsscon
+		outputStream.write startCommand
+		byte[] data = new byte[64 * 3]
+		TestUtils.shouldFailWith(RssconIOException) { inputStream.read(data) }
+		outputStream.write stopCommand
+		outputStream.close()
+	}
+
+	@Test
+	void "write start and read data block no wait"() {
+		if (!deviceAvailable) {
+			return
+		}
+
+		def device = devicePath
+		def baudRate = BaudRate.BAUDRATE_921600
+		def rsscon = nativeFactory.create device, baudRate
+		rsscon.blocking = true
+		def outputStream = outputFactory.create rsscon
+		def inputStream = inputFactory.create rsscon
+		outputStream.write startCommand
+		byte[] data = new byte[64 * 3]
+		(1..20).each {
+			inputStream.read(data)
+			println data
+		}
+		outputStream.write stopCommand
+		outputStream.close()
+	}
+
+
+	@Test
+	void "write start and read data block and wait"() {
+		if (!deviceAvailable) {
+			return
+		}
+
+		def device = devicePath
+		def baudRate = BaudRate.BAUDRATE_921600
+		def rsscon = nativeFactory.create device, baudRate
+		rsscon.blocking = true
+		rsscon.wait = true
 		def outputStream = outputFactory.create rsscon
 		def inputStream = inputFactory.create rsscon
 		outputStream.write startCommand
@@ -79,6 +124,7 @@ class RssconKeypenDeviceTest extends RssconTestUtils {
 		def device = devicePath
 		def baudRate = BaudRate.BAUDRATE_921600
 		def rsscon = nativeFactory.create device, baudRate
+		rsscon.blocking = true
 		def outputStream = outputFactory.create rsscon
 		def inputStream = new BufferedInputStream(inputFactory.create(rsscon), 64 * 3 * 10)
 		outputStream.write startCommand
