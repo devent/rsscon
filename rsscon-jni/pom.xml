@@ -14,7 +14,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>nar</packaging>
 	<name>Rsscon :: JNI</name>
-	<description>Reads and writes data to a RS-232 (serial) device with the help of a native library.</description>
+	<description>JNI bindings to reads and writes data to RS-232 (serial) device.</description>
 	<inceptionYear>2012</inceptionYear>
 
 	<dependencies>
@@ -40,13 +40,13 @@
 		<dependency>
 			<groupId>com.anrisoftware.rsscon</groupId>
 			<artifactId>rsscon-shared</artifactId>
-			<version>1.1-SNAPSHOT</version>
+			<version>1.1</version>
 			<type>nar</type>
 		</dependency>
 		<dependency>
 			<groupId>com.anrisoftware.rsscon</groupId>
 			<artifactId>rsscon-api</artifactId>
-			<version>1.0</version>
+			<version>1.1</version>
 		</dependency>
 
 		<!-- compile dependencies -->
