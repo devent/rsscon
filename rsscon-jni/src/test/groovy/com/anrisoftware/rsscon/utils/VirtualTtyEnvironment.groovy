@@ -68,9 +68,10 @@ class VirtualTtyEnvironment {
 		def outputString = output.toString()
 		def outputSplit = StringUtils.split(outputString, "\n")
 		outputSplit.each {
-			def matcher = ptsPattern.matcher(outputSplit[0])
-			matcher.find()
-			virtualDevices << matcher.group(1)
+			def matcher = ptsPattern.matcher(it)
+			if (matcher.find()) {
+				virtualDevices << matcher.group(1)
+			}
 		}
 		log.info "Virtual devices are {}", virtualDevices
 		this
