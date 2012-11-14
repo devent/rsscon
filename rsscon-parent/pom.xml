@@ -67,7 +67,7 @@
 				<!-- LGPL3 -->
 				<groupId>com.anrisoftware.globalpom</groupId>
 				<artifactId>globalpom-groovytestutils</artifactId>
-				<version>1.9</version>
+				<version>1.10</version>
 			</dependency>
 			<dependency>
 				<!-- Apache License 2.0 -->
