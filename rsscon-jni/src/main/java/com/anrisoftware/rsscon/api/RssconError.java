@@ -1,0 +1,80 @@
+package com.anrisoftware.rsscon.api;
+
+/**
+ * Enumarates the Rsscon error values.
+ * 
+ * @author Erwin Mueller, erwin.mueller@deventm.org
+ * @since 1.0
+ */
+public enum RssconError {
+
+	/**
+	 * No error.
+	 */
+	NOERROR(0),
+
+	/**
+	 * Error opening the device.
+	 */
+	OPENDEVICE(-1),
+
+	/**
+	 * Error closing the device.
+	 */
+	CLOSEDEVICE(-2),
+
+	/**
+	 * Error setup the device.
+	 */
+	SETUPDEVICE(-3),
+
+	/**
+	 * Error setting flags because device is already open.
+	 */
+	DEVICE_OPENED(-4),
+
+	/**
+	 * Error writing to the device.
+	 */
+	ERROR_WRITE(-5),
+
+	/**
+	 * Error reading from the device.
+	 */
+	ERROR_READ(-6);
+
+	/**
+	 * Parse the specified error value to the rsscon error.
+	 * 
+	 * @param value
+	 *            the error value.
+	 * 
+	 * @return the {@link RssconError}.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the specified error value is not a rsscon error.
+	 */
+	public static RssconError valueOf(int value) {
+		for (RssconError error : RssconError.values()) {
+			if (error.getValue() == value) {
+				return error;
+			}
+		}
+		throw new IllegalArgumentException();
+	}
+
+	private final int value;
+
+	private RssconError(int value) {
+		this.value = value;
+	}
+
+	/**
+	 * Returns the error value.
+	 * 
+	 * @return the error value.
+	 */
+	public int getValue() {
+		return value;
+	}
+}

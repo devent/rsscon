@@ -166,7 +166,7 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
     bool ret = rssconFree(rsscon);
     if (!ret) {
     	throwIOExceptionDevice(env,
-                "Error free rsscon driver for device %s: %d - %d (%s)",
+                "Error free rsscon driver for device %s: %s - %d (%s)",
                 rssconGetDevice(rsscon),
                 rssconGetLastError(rsscon),
                 rssconGetErrorNumber(rsscon),
@@ -183,7 +183,7 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
     bool ret = rssconInit(rsscon);
     if (!ret) {
     	throwIOExceptionDevice(env,
-                "Error initialize rsscon driver for device %s: %d - %d (%s)",
+                "Error initialize rsscon driver for device %s: %s - %d (%s)",
                 rssconGetDevice(rsscon),
                 rssconGetLastError(rsscon),
                 rssconGetErrorNumber(rsscon),
@@ -200,7 +200,7 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
     bool ret = rssconOpen(rsscon);
     if (!ret) {
     	throwIOExceptionDevice(env,
-                "Error open rsscon driver for device %s: %d - %d (%s)",
+                "Error open rsscon driver for device %s: %s - %d (%s)",
                 rssconGetDevice(rsscon),
                 rssconGetLastError(rsscon),
                 rssconGetErrorNumber(rsscon),
@@ -217,7 +217,7 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
     bool ret = rssconClose(rsscon);
     if (!ret) {
     	throwIOExceptionDevice(env,
-                "Error close rsscon driver for device %s: %d - %d (%s)",
+                "Error close rsscon driver for device %s: %s - %d (%s)",
                 rssconGetDevice(rsscon),
                 rssconGetLastError(rsscon),
                 rssconGetErrorNumber(rsscon),
@@ -244,7 +244,7 @@ JNIEXPORT jint JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
 
     if (!ret) {
     	throwIOExceptionDevice(env,
-                "Error write to rsscon driver for device %s: %d - %d (%s)",
+                "Error write to rsscon driver for device %s: %s - %d (%s)",
                 rssconGetDevice(rsscon),
                 rssconGetLastError(rsscon),
                 rssconGetErrorNumber(rsscon),
@@ -272,7 +272,7 @@ JNIEXPORT jint JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
 
     if (!ret) {
     	throwIOExceptionDevice(env,
-                "Error read data from rsscon driver for device %s: %d - %d (%s)",
+                "Error read data from rsscon driver for device %s: %s - %d (%s)",
                 rssconGetDevice(rsscon),
                 rssconGetLastError(rsscon),
                 rssconGetErrorNumber(rsscon),
