@@ -25,16 +25,16 @@
 			<artifactId>commons-exec</artifactId>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>com.anrisoftware.propertiesutils</groupId>
-            <artifactId>propertiesutils-contextproperties</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.anrisoftware.globalpom</groupId>
-            <artifactId>globalpom-groovytestutils</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>com.anrisoftware.propertiesutils</groupId>
+			<artifactId>propertiesutils-contextproperties</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.anrisoftware.globalpom</groupId>
+			<artifactId>globalpom-groovytestutils</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- own modules dependencies -->
 		<dependency>
@@ -85,6 +85,9 @@
 							<linkCPP>false</linkCPP>
 						</library>
 					</libraries>
+					<c>
+						<optimize>full</optimize>
+					</c>
 				</configuration>
 			</plugin>
 		</plugins>
