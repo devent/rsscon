@@ -37,6 +37,9 @@
 							</sysLib>
 						</sysLibs>
 					</linker>
+					<c>
+						<optimize>full</optimize>
+					</c>
 				</configuration>
 			</plugin>
 		</plugins>
