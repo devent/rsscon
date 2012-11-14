@@ -27,25 +27,33 @@
 #define JNU_CLASS_IOEXCEPTION "java/io/IOException"
 
 /**
- * Throws exception with the specified name.
- * Adopted from http://java.sun.com/docs/books/jni/html/exceptions.html#11202
+ * The name of com.anrisoftware.rsscon.api.RssconIOException.
  */
-void JNU_ThrowByName(JNIEnv *env, const char *name, const char *msg) {
-    jclass cls = (*env)->FindClass(env, name);
-    /* if cls is NULL, an exception has already been thrown */
-    if (cls != NULL) {
-        (*env)->ThrowNew(env, cls, msg);
-    }
-    /* free the local ref */
-    (*env)->DeleteLocalRef(env, cls);
+#define JNU_CLASS_RSSCONIOEXCEPTION "com/anrisoftware/rsscon/api/RssconIOException"
+
+/**
+ * Throws the java.io.IOException with a message.
+ */
+void throwIOException(JNIEnv *env, const char* msg) {
+     jclass cls = (*env)->FindClass(env, JNU_CLASS_IOEXCEPTION);
+     (*env)->ThrowNew(env, cls, msg);
 }
 
 /**
- * Throws IOException with the specified message.
- * Adopted from http://java.sun.com/docs/books/jni/html/exceptions.html#11202
+ * Throws the com.anrisoftware.rsscon.api.RssconIOException
+ * with the device string.
  */
-void JNU_ThrowIOException(JNIEnv *env, const char *msg) {
-	JNU_ThrowByName(env, JNU_CLASS_IOEXCEPTION, msg);
+void throwIOExceptionDevice(JNIEnv *env, const char* format,
+		const char* device, int lastError, int errorNumber, const char* error) {
+    jclass cls = (*env)->FindClass(env, JNU_CLASS_RSSCONIOEXCEPTION);
+    jmethodID ctor = (*env)->GetMethodID(env, cls, "<init>",
+    		"(Ljava/lang/String;Ljava/lang/String;IILjava/lang/String;)V");
+    jstring javaFormat = (*env)->NewStringUTF(env, (const char *)format);
+    jstring javaDevice = (*env)->NewStringUTF(env, (const char *)device);
+    jstring javaError = (*env)->NewStringUTF(env, (const char *)error);
+    jobject obj = (*env)->NewObject(env, cls, ctor, javaFormat, javaDevice,
+    		lastError, errorNumber, javaError);
+	(*env)->Throw(env, (jthrowable)obj);
 }
 
 /**
@@ -122,7 +130,7 @@ LOG4C_CATEGORY get_rsscon_log() {
  */
 void free_log_and_throw(JNIEnv *env) {
     if (!free_log()) {
-        JNU_ThrowByName(env, JNU_CLASS_IOEXCEPTION, "free_log() failed.");
+        throwIOException(env, "free_log() failed.");
     }
 }
 
@@ -136,12 +144,12 @@ JNIEXPORT jlong JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl
 
     int baudrate = translateBaudrate(baudratenumber);
 
-    log_trace(log, "convert device name to c string.");
+    log_trace(log, "Convert device name to c string.");
     char device[256];
     jsize length = (*env)->GetStringUTFLength(env, devicestr);
     (*env)->GetStringUTFRegion(env, devicestr, 0, length, device);
 
-    log_trace(log, "create rsscon device '%s' %d.", device, baudrate);
+    log_trace(log, "Create rsscon device '%s' %d.", device, baudrate);
     long rsscon = toJava(rssconCreate(device, baudrate));
 
     log_leave(log, "rssconCreate := %d", &rsscon);
@@ -157,8 +165,12 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     bool ret = rssconFree(rsscon);
     if (!ret) {
-        JNU_ThrowByName(env, JNU_CLASS_IOEXCEPTION,
-                "Could not free the allocated memory of the rsscon driver.");
+    	throwIOExceptionDevice(env,
+                "Error free rsscon driver for device %s: %d - %d (%s)",
+                rssconGetDevice(rsscon),
+                rssconGetLastError(rsscon),
+                rssconGetErrorNumber(rsscon),
+                rssconGetErrorNumberAsString(rsscon));
     }
 }
 
@@ -170,8 +182,12 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     bool ret = rssconInit(rsscon);
     if (!ret) {
-        JNU_ThrowByName(env, JNU_CLASS_IOEXCEPTION,
-                "Could not initialize the rsscon driver.");
+    	throwIOExceptionDevice(env,
+                "Error initialize rsscon driver for device %s: %d - %d (%s)",
+                rssconGetDevice(rsscon),
+                rssconGetLastError(rsscon),
+                rssconGetErrorNumber(rsscon),
+                rssconGetErrorNumberAsString(rsscon));
     }
 }
 
@@ -183,8 +199,12 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     bool ret = rssconOpen(rsscon);
     if (!ret) {
-        JNU_ThrowByName(env, JNU_CLASS_IOEXCEPTION,
-                "Could not open the port for read and write access.");
+    	throwIOExceptionDevice(env,
+                "Error open rsscon driver for device %s: %d - %d (%s)",
+                rssconGetDevice(rsscon),
+                rssconGetLastError(rsscon),
+                rssconGetErrorNumber(rsscon),
+                rssconGetErrorNumberAsString(rsscon));
     }
 }
 
@@ -196,8 +216,12 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     bool ret = rssconClose(rsscon);
     if (!ret) {
-        JNU_ThrowByName(env, JNU_CLASS_IOEXCEPTION,
-        		"Could not close the port.");
+    	throwIOExceptionDevice(env,
+                "Error close rsscon driver for device %s: %d - %d (%s)",
+                rssconGetDevice(rsscon),
+                rssconGetLastError(rsscon),
+                rssconGetErrorNumber(rsscon),
+                rssconGetErrorNumberAsString(rsscon));
     }
 }
 
@@ -219,8 +243,12 @@ JNIEXPORT jint JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
     (*env)->ReleaseByteArrayElements(env, b, data, 0);
 
     if (!ret) {
-        JNU_ThrowByName(env, JNU_CLASS_IOEXCEPTION,
-                "Could not write data to the port.");
+    	throwIOExceptionDevice(env,
+                "Error write to rsscon driver for device %s: %d - %d (%s)",
+                rssconGetDevice(rsscon),
+                rssconGetLastError(rsscon),
+                rssconGetErrorNumber(rsscon),
+                rssconGetErrorNumberAsString(rsscon));
     }
     return wrote;
 }
@@ -243,8 +271,12 @@ JNIEXPORT jint JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
     (*env)->ReleaseByteArrayElements(env, b, data, 0);
 
     if (!ret) {
-        JNU_ThrowByName(env, JNU_CLASS_IOEXCEPTION,
-                "Could not read data to the port.");
+    	throwIOExceptionDevice(env,
+                "Error read data from rsscon driver for device %s: %d - %d (%s)",
+                rssconGetDevice(rsscon),
+                rssconGetLastError(rsscon),
+                rssconGetErrorNumber(rsscon),
+                rssconGetErrorNumberAsString(rsscon));
     }
     return red;
 }
@@ -256,4 +288,49 @@ JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeI
         JNIEnv *env, jobject this, jlong rssconaddr) {
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     return rssconIsOpen(rsscon);
+}
+
+/**
+ * Method boolean rssconSetBlocking(long rsscon, boolean block).
+ */
+JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconSetBlocking
+  (JNIEnv *env, jobject this, jlong rssconaddr, jboolean block) {
+    Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
+    return rssconSetBlocking(rsscon, block);
+}
+
+/**
+ * Method boolean rssconGetBlocking(long rsscon).
+ */
+JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconGetBlocking
+  (JNIEnv *env, jobject this, jlong rssconaddr) {
+    Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
+    return rssconGetBlocking(rsscon);
+}
+
+/**
+ * Method boolean rssconSetWait(long rsscon, boolean wait).
+ */
+JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconSetWait
+  (JNIEnv *env, jobject this, jlong rssconaddr, jboolean wait) {
+    Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
+    return rssconSetWait(rsscon, wait);
+}
+
+/**
+ * Method boolean rssconGetWait(long rsscon).
+ */
+JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconGetWait
+  (JNIEnv *env, jobject this, jlong rssconaddr) {
+    Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
+    return rssconGetWait(rsscon);
+}
+
+/**
+ * Method int rssconGetLastError(long rsscon).
+ */
+JNIEXPORT jint JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconGetLastError
+  (JNIEnv *env, jobject this, jlong rssconaddr) {
+    Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
+    return rssconGetLastError(rsscon);
 }

@@ -114,20 +114,35 @@ class RssconNativeImpl implements RssconNative {
 				.append("baud rate", baudRate).toString();
 	}
 
-	private native long rssconCreate(String device, int baudrate);
+	private native long rssconCreate(String device, int baudrate)
+			throws IOException;
 
-	private native void rssconFree(long rsscon);
+	private native void rssconFree(long rsscon) throws IOException;
 
-	private native void rssconInit(long rsscon);
+	private native void rssconInit(long rsscon) throws IOException;
 
-	private native void rssconOpen(long rsscon);
+	private native void rssconOpen(long rsscon) throws IOException;
 
-	private native void rssconClose(long rsscon);
+	private native void rssconClose(long rsscon) throws IOException;
 
-	private native boolean rssconIsOpen(long rsscon);
+	private native boolean rssconIsOpen(long rsscon) throws IOException;
 
-	private native int rssconWrite(long rsscon, byte[] data, int length);
+	private native boolean rssconSetBlocking(long rsscon, boolean block)
+			throws IOException;
 
-	private native int rssconRead(long rsscon, byte[] data, int length);
+	private native boolean rssconGetBlocking(long rsscon) throws IOException;
+
+	private native boolean rssconSetWait(long rsscon, boolean wait)
+			throws IOException;
+
+	private native boolean rssconGetWait(long rsscon) throws IOException;
+
+	private native int rssconWrite(long rsscon, byte[] data, int length)
+			throws IOException;
+
+	private native int rssconRead(long rsscon, byte[] data, int length)
+			throws IOException;
+
+	private native int rssconGetLastError(long rsscon) throws IOException;
 
 }
