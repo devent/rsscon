@@ -18,6 +18,8 @@
  */
 package com.anrisoftware.rsscon.nativeimpl
 
+import groovy.util.logging.Slf4j
+
 import org.junit.Test
 
 import com.anrisoftware.globalpom.utils.TestUtils
@@ -31,6 +33,7 @@ import com.anrisoftware.rsscon.utils.RssconTestUtils
  * @author Erwin Mueller, erwin.mueller@deventm.org
  * @since 1.0
  */
+@Slf4j
 class RssconKeypenDeviceTest extends RssconTestUtils {
 
 	static final byte[] startCommand = [
@@ -83,9 +86,9 @@ class RssconKeypenDeviceTest extends RssconTestUtils {
 		def inputStream = inputFactory.create rsscon
 		outputStream.write startCommand
 		byte[] data = new byte[64 * 3]
-		(1..20).each {
+		(1..4).each {
 			inputStream.read(data)
-			println data
+			log.info "Read {}", data
 		}
 		outputStream.write stopCommand
 		outputStream.close()
@@ -107,9 +110,9 @@ class RssconKeypenDeviceTest extends RssconTestUtils {
 		def inputStream = inputFactory.create rsscon
 		outputStream.write startCommand
 		byte[] data = new byte[64 * 3]
-		(1..20).each {
+		(1..4).each {
 			inputStream.read(data)
-			println data
+			log.info "Read {}", data
 		}
 		outputStream.write stopCommand
 		outputStream.close()
@@ -129,9 +132,9 @@ class RssconKeypenDeviceTest extends RssconTestUtils {
 		def inputStream = new BufferedInputStream(inputFactory.create(rsscon), 64 * 3 * 10)
 		outputStream.write startCommand
 		byte[] data = new byte[64 * 3]
-		(1..20).each {
+		(1..4).each {
 			inputStream.read(data)
-			println data
+			log.info "Read {}", data
 		}
 		outputStream.write stopCommand
 		outputStream.close()
