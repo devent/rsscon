@@ -249,7 +249,7 @@ bool rssconlinuxOpen(Rsscon* rsscon) {
 	if (pdata->fd == -1) {
 		rssconSetLastError(rsscon, RSSCON_ERROR_OPENDEVICE, errno);
 		log_error(log, "error open device '%s': %s", device, strerrno(errno));
-		log_leave(log, "rssconlinuxOpen := true");
+		log_leave(log, "rssconlinuxOpen := false");
 		free_log();
 		return false;
 	}
@@ -259,7 +259,7 @@ bool rssconlinuxOpen(Rsscon* rsscon) {
 	if (!ret) {
 		rssconSetLastError(rsscon, RSSCON_ERROR_OPENDEVICE, errno);
 		log_error(log, "error setup device '%s': %s", device, strerrno(errno));
-		log_leave(log, "rssconlinuxOpen := true");
+		log_leave(log, "rssconlinuxOpen := false");
 		free_log();
 		return false;
 	}
@@ -443,6 +443,13 @@ int rssconlinuxGetErrorNumber(Rsscon* rsscon) {
 	return pdata->errorNumber;
 }
 
+const char* rssconlinuxGetErrorNumberAsString(Rsscon* rsscon) {
+	assert(rsscon != NULL);
+	assert(rsscon->portdata != NULL);
+	RssconlinuxPortdata* pdata = (RssconlinuxPortdata*) rsscon->portdata;
+	return strerrno(pdata->errorNumber);
+}
+
 bool rssconInit(Rsscon* rsscon) {
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
 	log_enter(log, "rssconInit");
@@ -461,6 +468,7 @@ bool rssconInit(Rsscon* rsscon) {
 	rsscon->rssconGetWait = rssconlinuxGetWait;
 	rsscon->rssconSetErrorNumber = rssconlinuxSetErrorNumber;
 	rsscon->rssconGetErrorNumber = rssconlinuxGetErrorNumber;
+	rsscon->rssconGetErrorNumberAsString = rssconlinuxGetErrorNumberAsString;
 
 	log_leave(log, "rssconInit");
 	free_log();

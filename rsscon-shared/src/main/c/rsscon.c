@@ -77,6 +77,7 @@ Rsscon* rssconCreate(const char* device, unsigned int baudRate) {
 	rsscon->rssconGetWait = NULL;
 	rsscon->rssconSetErrorNumber = NULL;
 	rsscon->rssconGetErrorNumber = NULL;
+	rsscon->rssconGetErrorNumberAsString = NULL;
 
 	rsscon->portdata = NULL;
 	rsscon->private = private;
@@ -189,6 +190,13 @@ int rssconGetErrorNumber(Rsscon* rsscon) {
 	assert(rsscon->private != NULL);
 	assert(rsscon->rssconGetErrorNumber != NULL);
 	return rsscon->rssconGetErrorNumber(rsscon);
+}
+
+const char* rssconGetErrorNumberAsString(Rsscon* rsscon) {
+	assert(rsscon != NULL);
+	assert(rsscon->private != NULL);
+	assert(rsscon->rssconGetErrorNumberAsString != NULL);
+	return rsscon->rssconGetErrorNumberAsString(rsscon);
 }
 
 bool rssconIsOpen(Rsscon* rsscon) {

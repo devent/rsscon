@@ -99,6 +99,8 @@ typedef bool (*RssconSetErrorNumber)(Rsscon*, int);
 
 typedef int (*RssconGetErrorNumber)(Rsscon*);
 
+typedef const char* (*RssconGetErrorNumberAsString)(Rsscon*);
+
 /**
  * Structure defines the public interface to rsscon.
  */
@@ -205,8 +207,7 @@ struct Rsscon {
 	RssconGetWait rssconGetWait;
 
 	/**
-	 * Sets the system specific error number from the last error caused by
-	 * accessing the port.
+	 * Sets the system specific error number from the last error caused.
 	 *
 	 * (Rsscon*): the Rsscon data structure.
 	 * int: the code of the system error.
@@ -215,14 +216,20 @@ struct Rsscon {
 	RssconSetErrorNumber rssconSetErrorNumber;
 
 	/**
-	 * Get the system specific error number from the last error caused by
-	 * accessing the port.
+	 * Get the system specific error number from the last error caused.
 	 *
 	 * (Rsscon*): the Rsscon data structure.
 	 * return int: the code of the system error.
 	 */
 	RssconGetErrorNumber rssconGetErrorNumber;
 
+	/**
+	 * Returns a string for the system specific error number.
+	 *
+	 * (Rsscon*): the Rsscon data structure.
+	 * return const char*: the string of the system error.
+	 */
+	RssconGetErrorNumberAsString rssconGetErrorNumberAsString;
 };
 
 /**
@@ -346,7 +353,7 @@ const char* rssconGetDevice(Rsscon* rsscon);
 unsigned int rssconGetBaudRate(Rsscon* rsscon);
 
 /**
- * Sets the last error caused by accessing the port.
+ * Sets the last error caused.
  *
  * rsscon: The public interface to the rsscon driver.
  * lastError: The last error, see the RSSCON_ERROR_* constants.
@@ -356,7 +363,7 @@ unsigned int rssconGetBaudRate(Rsscon* rsscon);
 bool rssconSetLastError(Rsscon* rsscon, int lastError, int errorNumber);
 
 /**
- * Get the last error caused by accessing the port.
+ * Get the last error caused.
  *
  * rsscon: The public interface to the rsscon driver.
  * return: the code of the last error.
@@ -364,12 +371,20 @@ bool rssconSetLastError(Rsscon* rsscon, int lastError, int errorNumber);
 int rssconGetLastError(Rsscon* rsscon);
 
 /**
- * Get the system specific error number from the last error caused by
- * accessing the port.
+ * Get the system specific error number from the last error caused.
  *
  * rsscon: The public interface to the rsscon driver.
  * return: the code of the system error.
  */
 int rssconGetErrorNumber(Rsscon* rsscon);
+
+/**
+ * Returns a string for the system specific error number from the last
+ * error caused.
+ *
+ * rsscon: The public interface to the rsscon driver.
+ * return: the string of the system error.
+ */
+const char* rssconGetErrorNumberAsString(Rsscon* rsscon);
 
 #endif /* RSSCON_H_ */
