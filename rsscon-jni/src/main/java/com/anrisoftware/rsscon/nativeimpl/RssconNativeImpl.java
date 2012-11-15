@@ -31,15 +31,9 @@ import com.google.inject.assistedinject.Assisted;
  * The binding to the native rsscon driver library.
  * 
  * @author Erwin Mueller, erwin.mueller@deventm.org
- * @version 2011
+ * @since 1.0
  */
-class RssconNativeImpl implements RssconNative {
-
-	static {
-		NarSystem.loadLibrary();
-	}
-
-	private static final String LIB_RSSCONDRIVER = "rsscondriver";
+class RssconNativeImpl extends NativeBinding implements RssconNative {
 
 	private final RssconNativeImplLogger log;
 
@@ -131,36 +125,5 @@ class RssconNativeImpl implements RssconNative {
 		return new ToStringBuilder(this).append("device", device)
 				.append("baud rate", baudRate).toString();
 	}
-
-	private native long rssconCreate(String device, int baudrate)
-			throws IOException;
-
-	private native void rssconFree(long rsscon) throws IOException;
-
-	private native void rssconInit(long rsscon) throws IOException;
-
-	private native void rssconOpen(long rsscon) throws IOException;
-
-	private native void rssconClose(long rsscon) throws IOException;
-
-	private native boolean rssconIsOpen(long rsscon) throws IOException;
-
-	private native boolean rssconSetBlocking(long rsscon, boolean block)
-			throws IOException;
-
-	private native boolean rssconGetBlocking(long rsscon) throws IOException;
-
-	private native boolean rssconSetWait(long rsscon, boolean wait)
-			throws IOException;
-
-	private native boolean rssconGetWait(long rsscon) throws IOException;
-
-	private native int rssconWrite(long rsscon, byte[] data, int length)
-			throws IOException;
-
-	private native int rssconRead(long rsscon, byte[] data, int length)
-			throws IOException;
-
-	private native int rssconGetLastError(long rsscon) throws IOException;
 
 }

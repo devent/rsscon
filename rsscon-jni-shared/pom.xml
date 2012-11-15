@@ -1,0 +1,60 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.anrisoftware.rsscon</groupId>
+		<artifactId>rsscon-parent</artifactId>
+		<version>1.1</version>
+		<relativePath>../rsscon-parent</relativePath>
+	</parent>
+
+	<artifactId>rsscon-jni-shared</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>nar</packaging>
+	<name>Rsscon :: JNI Shared</name>
+	<description>JNI bindings to reads and writes data to RS-232 (serial) device.</description>
+	<inceptionYear>2012</inceptionYear>
+
+	<dependencies>
+
+		<!-- own modules dependencies -->
+		<dependency>
+			<groupId>com.anrisoftware.rsscon</groupId>
+			<artifactId>rsscon-shared</artifactId>
+			<version>1.1</version>
+			<type>nar</type>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<defaultGoal>install</defaultGoal>
+		<plugins>
+			<plugin>
+				<artifactId>maven-nar-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<linker>
+						<sysLibs>
+							<sysLib>
+								<name>log4c</name>
+							</sysLib>
+						</sysLibs>
+					</linker>
+					<libraries>
+						<library>
+							<type>jni</type>
+							<narSystemPackage>com.anrisoftware.rsscon.nativeimpl</narSystemPackage>
+							<linkCPP>false</linkCPP>
+						</library>
+					</libraries>
+					<c>
+						<optimize>full</optimize>
+					</c>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

@@ -12,6 +12,7 @@
     <modules>
         <module>rsscon-api</module>
         <module>rsscon-jni</module>
+        <module>rsscon-jni-shared</module>
         <module>rsscon-parent</module>
         <module>rsscon-shared</module>
     </modules>
