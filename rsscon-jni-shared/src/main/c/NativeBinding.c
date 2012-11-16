@@ -1,22 +1,22 @@
 /**
  * Copyright 2012 Erwin Müller <erwin.mueller@deventm.org>
  *
- * This file is part of rsscon-jni.
+ * This file is part of rsscon-jni-shared.
  *
- * rsscon-jni is free software: you can redistribute it and/or modify it
+ * rsscon-jni-shared is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.
  *
- * rsscon-jni is distributed in the hope that it will be useful, but
+ * rsscon-jni-shared is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with rsscon-jni. If not, see <http://www.gnu.org/licenses/>.
+ * along with rsscon-jni-shared. If not, see <http://www.gnu.org/licenses/>.
  */
-#include "com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl.h"
+#include "com_anrisoftware_rsscon_nativeimpl_NativeBinding.h"
 #include <rsscon.h>
 #include <logger.h>
 #include <string.h>
@@ -137,7 +137,7 @@ void free_log_and_throw(JNIEnv *env) {
 /**
  * Method long rssconCreate(String device, int baudrate).
  */
-JNIEXPORT jlong JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconCreate(
+JNIEXPORT jlong JNICALL Java_com_anrisoftware_rsscon_nativeimpl_NativeBinding_rssconCreate(
         JNIEnv *env, jobject this, jstring devicestr, jint baudratenumber) {
     LOG4C_CATEGORY log = get_rsscon_log();
     log_enter(log, "rssconCreate");
@@ -160,7 +160,7 @@ JNIEXPORT jlong JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl
 /**
  * Method void rssconFree(long rsscon).
  */
-JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconFree(
+JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_NativeBinding_rssconFree(
         JNIEnv *env, jobject this, jlong rssconaddr) {
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     bool ret = rssconFree(rsscon);
@@ -177,7 +177,7 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
 /**
  * Method void rssconInit(long rsscon).
  */
-JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconInit(
+JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_NativeBinding_rssconInit(
         JNIEnv *env, jobject this, jlong rssconaddr) {
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     bool ret = rssconInit(rsscon);
@@ -194,7 +194,7 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
 /**
  * Method void rssconOpen(long rsscon).
  */
-JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconOpen(
+JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_NativeBinding_rssconOpen(
         JNIEnv *env, jobject this, jlong rssconaddr) {
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     bool ret = rssconOpen(rsscon);
@@ -211,7 +211,7 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
 /**
  * Method void rssconClose(long rsscon).
  */
-JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconClose(
+JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_NativeBinding_rssconClose(
         JNIEnv *env, jobject this, jlong rssconaddr) {
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     bool ret = rssconClose(rsscon);
@@ -228,7 +228,7 @@ JNIEXPORT void JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
 /**
  * Method int rssconWrite(long rsscon, byte[] data, int length).
  */
-JNIEXPORT jint JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconWrite(
+JNIEXPORT jint JNICALL Java_com_anrisoftware_rsscon_nativeimpl_NativeBinding_rssconWrite(
         JNIEnv *env, jobject this, jlong rssconaddr, jbyteArray b, jint len) {
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
 
@@ -256,7 +256,7 @@ JNIEXPORT jint JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
 /**
  * Method int rssconRead(long rsscon, byte[] data, int length).
  */
-JNIEXPORT jint JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconRead(
+JNIEXPORT jint JNICALL Java_com_anrisoftware_rsscon_nativeimpl_NativeBinding_rssconRead(
         JNIEnv *env, jobject this, jlong rssconaddr, jbyteArray b, jint len) {
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
 
@@ -284,7 +284,7 @@ JNIEXPORT jint JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_
 /**
  * Method boolean rssconIsOpen(long rsscon).
  */
-JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconIsOpen(
+JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_NativeBinding_rssconIsOpen(
         JNIEnv *env, jobject this, jlong rssconaddr) {
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     return rssconIsOpen(rsscon);
@@ -293,7 +293,7 @@ JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeI
 /**
  * Method boolean rssconSetBlocking(long rsscon, boolean block).
  */
-JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconSetBlocking
+JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_NativeBinding_rssconSetBlocking
   (JNIEnv *env, jobject this, jlong rssconaddr, jboolean block) {
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     return rssconSetBlocking(rsscon, block);
@@ -302,7 +302,7 @@ JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeI
 /**
  * Method boolean rssconGetBlocking(long rsscon).
  */
-JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconGetBlocking
+JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_NativeBinding_rssconGetBlocking
   (JNIEnv *env, jobject this, jlong rssconaddr) {
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     return rssconGetBlocking(rsscon);
@@ -311,7 +311,7 @@ JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeI
 /**
  * Method boolean rssconSetWait(long rsscon, boolean wait).
  */
-JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconSetWait
+JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_NativeBinding_rssconSetWait
   (JNIEnv *env, jobject this, jlong rssconaddr, jboolean wait) {
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     return rssconSetWait(rsscon, wait);
@@ -320,7 +320,7 @@ JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeI
 /**
  * Method boolean rssconGetWait(long rsscon).
  */
-JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconGetWait
+JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_NativeBinding_rssconGetWait
   (JNIEnv *env, jobject this, jlong rssconaddr) {
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     return rssconGetWait(rsscon);
@@ -329,7 +329,7 @@ JNIEXPORT jboolean JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeI
 /**
  * Method int rssconGetLastError(long rsscon).
  */
-JNIEXPORT jint JNICALL Java_com_anrisoftware_rsscon_nativeimpl_RssconNativeImpl_rssconGetLastError
+JNIEXPORT jint JNICALL Java_com_anrisoftware_rsscon_nativeimpl_NativeBinding_rssconGetLastError
   (JNIEnv *env, jobject this, jlong rssconaddr) {
     Rsscon *rsscon = (Rsscon*) toC(rssconaddr);
     return rssconGetLastError(rsscon);
