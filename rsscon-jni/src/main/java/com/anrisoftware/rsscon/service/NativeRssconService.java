@@ -22,7 +22,7 @@ import org.apache.commons.lang3.concurrent.ConcurrentException;
 
 import com.anrisoftware.rsscon.api.NativeRssconInputStreamFactory;
 import com.anrisoftware.rsscon.api.NativeRssconOutputStreamFactory;
-import com.anrisoftware.rsscon.api.RssconNative;
+import com.anrisoftware.rsscon.api.RssconNativeFactory;
 import com.anrisoftware.rsscon.api.RssconService;
 import com.anrisoftware.rsscon.api.RssconServiceInfo;
 import com.google.inject.Injector;
@@ -48,8 +48,8 @@ public class NativeRssconService implements RssconService {
 		lazyInjector.setParentInjector(injector);
 	}
 
-	public RssconNative getRssconNative() {
-		return getInjector().getInstance(RssconNative.class);
+	public RssconNativeFactory getRssconNative() {
+		return getInjector().getInstance(RssconNativeFactory.class);
 	}
 
 	@SuppressWarnings("unchecked")
