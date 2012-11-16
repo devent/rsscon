@@ -19,6 +19,7 @@
 package com.anrisoftware.rsscon.service;
 
 import org.apache.commons.lang3.concurrent.ConcurrentException;
+import org.mangosdk.spi.ProviderFor;
 
 import com.anrisoftware.rsscon.api.NativeRssconInputStreamFactory;
 import com.anrisoftware.rsscon.api.NativeRssconOutputStreamFactory;
@@ -27,14 +28,28 @@ import com.anrisoftware.rsscon.api.RssconService;
 import com.anrisoftware.rsscon.api.RssconServiceInfo;
 import com.google.inject.Injector;
 
+/**
+ * Native Rsscon service.
+ * 
+ * @author Erwin Mueller, erwin.mueller@deventm.org
+ * @since 1.0
+ */
+@ProviderFor(RssconService.class)
 public class NativeRssconService implements RssconService {
 
 	private static final String NAME = "native-rsscon";
 
+	/**
+	 * The {@link RssconServiceInfo} information about the native Rsscon
+	 * service.
+	 */
 	public static final RssconServiceInfo INFO = new RssconServiceInfo(NAME);
 
 	private final LazyInjector lazyInjector;
 
+	/**
+	 * Creates the lazy injector.
+	 */
 	public NativeRssconService() {
 		this.lazyInjector = new LazyInjector();
 	}
