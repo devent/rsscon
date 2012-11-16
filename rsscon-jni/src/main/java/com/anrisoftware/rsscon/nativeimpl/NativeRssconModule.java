@@ -18,9 +18,20 @@
  */
 package com.anrisoftware.rsscon.nativeimpl;
 
+import static com.google.inject.Guice.createInjector;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
+import java.util.List;
+import java.util.Properties;
 
+import com.anrisoftware.nativeloader.api.NativeLoader;
+import com.anrisoftware.nativeloader.api.NativeLoaderFactory;
+import com.anrisoftware.nativeloader.service.NativeLoaderModule;
+import com.anrisoftware.propertiesutils.ContextProperties;
+import com.anrisoftware.propertiesutils.ContextPropertiesFactory;
 import com.anrisoftware.rsscon.api.NativeRssconInputStreamFactory;
 import com.anrisoftware.rsscon.api.NativeRssconOutputStreamFactory;
 import com.anrisoftware.rsscon.api.RssconNative;
@@ -36,6 +47,9 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
  */
 public class NativeRssconModule extends AbstractModule {
 
+	private static final URL NATIVE_LIBS_PROPERTIES_URL = NativeRssconModule.class
+			.getResource("native_libs.properties");
+
 	@Override
 	protected void configure() {
 		install(new FactoryModuleBuilder().implement(RssconNative.class,
@@ -46,6 +60,26 @@ public class NativeRssconModule extends AbstractModule {
 		install(new FactoryModuleBuilder().implement(InputStream.class,
 				RssconInputStream.class).build(
 				NativeRssconInputStreamFactory.class));
+		loadLibraries();
 	}
 
+	private void loadLibraries() {
+		ContextProperties p = new ContextProperties(this,
+				getNativeLibrariesProperties());
+		NativeLoaderFactory factory = createInjector(new NativeLoaderModule())
+				.getInstance(NativeLoaderFactory.class);
+		List<String> libs = p.getListProperty("libs");
+		NativeLoader loader = factory.create(libs.toArray(new String[0]));
+		loader.loadLibrary();
+	}
+
+	Properties getNativeLibrariesProperties() {
+		try {
+			return new ContextPropertiesFactory(this).withProperties(
+					System.getProperties()).fromResource(
+					NATIVE_LIBS_PROPERTIES_URL);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

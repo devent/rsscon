@@ -89,6 +89,17 @@ class RssconTestUtils {
 	}
 
 	@BeforeClass
+	static void checkLibraryPathSet() {
+		def log = LoggerFactory.getLogger(RssconTestUtils)
+		def libraryPath = System.getProperty("java.library.path")
+		def pathSep = System.getProperty("path.separator")
+		def customLibraryPath = libraryPath.split(pathSep).find { it.endsWith("customlibs") }
+		if (customLibraryPath == null) {
+			log.warn 'Custom library is expected for test: Set LD_LIBRARY_PATH=${workspace_loc}/customlibs.'
+		}
+	}
+
+	@BeforeClass
 	static void createFactories() {
 		injector = createInjector()
 		inputFactory = injector.getInstance NativeRssconInputStreamFactory

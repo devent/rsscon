@@ -1,20 +1,20 @@
 /*
  * Copyright 2012 Erwin Müller <erwin.mueller@deventm.org>
  *
- * This file is part of rsscon-jni.
+ * This file is part of nativeBinding.rsscon-jni.
  *
- * rsscon-jni is free software: you can redistribute it and/or modify it
+ * nativeBinding.rsscon-jni is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.
  *
- * rsscon-jni is distributed in the hope that it will be useful, but
+ * nativeBinding.rsscon-jni is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with rsscon-jni. If not, see <http://www.gnu.org/licenses/>.
+ * along with nativeBinding.rsscon-jni. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.anrisoftware.rsscon.nativeimpl;
 
@@ -28,18 +28,20 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
 /**
- * The binding to the native rsscon driver library.
+ * The binding to the native nativeBinding.rsscon driver library.
  * 
  * @author Erwin Mueller, erwin.mueller@deventm.org
  * @since 1.0
  */
-class RssconNativeImpl extends NativeBinding implements RssconNative {
+class RssconNativeImpl implements RssconNative {
 
 	private final RssconNativeImplLogger log;
 
 	private final String device;
 
 	private final BaudRate baudRate;
+
+	private final NativeBinding nativeBinding;
 
 	private boolean open;
 
@@ -50,9 +52,11 @@ class RssconNativeImpl extends NativeBinding implements RssconNative {
 	private boolean wait;
 
 	@Inject
-	RssconNativeImpl(RssconNativeImplLogger logger, @Assisted String device,
+	RssconNativeImpl(RssconNativeImplLogger logger,
+			NativeBinding nativeBinding, @Assisted String device,
 			@Assisted BaudRate baudRate) {
 		this.log = logger;
+		this.nativeBinding = nativeBinding;
 		this.device = device;
 		this.baudRate = baudRate;
 		this.open = false;
@@ -85,19 +89,20 @@ class RssconNativeImpl extends NativeBinding implements RssconNative {
 			return;
 		}
 		log.closeRsscon(this);
-		rssconClose(reference);
-		rssconFree(reference);
+		nativeBinding.rssconClose(reference);
+		nativeBinding.rssconFree(reference);
 		open = false;
 	}
 
 	public void open() throws IOException {
 		log.openDevice(this);
-		long reference = rssconCreate(device, baudRate.getBoudRate());
+		long reference = nativeBinding.rssconCreate(device,
+				baudRate.getBoudRate());
 		setReference(reference);
-		rssconInit(reference);
-		rssconSetBlocking(reference, block);
-		rssconSetWait(reference, wait);
-		rssconOpen(reference);
+		nativeBinding.rssconInit(reference);
+		nativeBinding.rssconSetBlocking(reference, block);
+		nativeBinding.rssconSetWait(reference, wait);
+		nativeBinding.rssconOpen(reference);
 		open = true;
 	}
 
@@ -110,12 +115,12 @@ class RssconNativeImpl extends NativeBinding implements RssconNative {
 	}
 
 	public void write(byte[] data, int length) throws IOException {
-		rssconWrite(reference, data, length);
+		nativeBinding.rssconWrite(reference, data, length);
 		log.writeBuffer(this, data);
 	}
 
 	public int read(byte[] data, int length) throws IOException {
-		int bytes = rssconRead(reference, data, length);
+		int bytes = nativeBinding.rssconRead(reference, data, length);
 		log.readBuffer(this, data, bytes);
 		return bytes;
 	}
