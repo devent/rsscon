@@ -18,3 +18,4 @@ makefile
 *.d
 *.o
 *.so
+.factorypath
