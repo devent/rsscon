@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>rsscon-jni-shared</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>nar</packaging>
 	<name>Rsscon :: JNI Shared</name>
 	<description>JNI bindings to reads and writes data to RS-232 (serial) device.</description>
