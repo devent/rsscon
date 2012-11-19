@@ -25,11 +25,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.anrisoftware.propertiesutils</groupId>
-			<artifactId>propertiesutils-contextproperties</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.anrisoftware.globalpom</groupId>
 			<artifactId>globalpom-groovytestutils</artifactId>
 			<scope>test</scope>
@@ -43,6 +38,10 @@
 		</dependency>
 
 		<!-- compile dependencies -->
+        <dependency>
+            <groupId>com.anrisoftware.propertiesutils</groupId>
+            <artifactId>propertiesutils-contextproperties</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-assistedinject</artifactId>
