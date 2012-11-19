@@ -18,11 +18,11 @@
  */
 package com.anrisoftware.rsscon.nativeimpl
 
+import static com.anrisoftware.globalpom.utils.TestUtils.*
 import groovy.util.logging.Slf4j
 
 import org.junit.Test
 
-import com.anrisoftware.globalpom.utils.TestUtils
 import com.anrisoftware.rsscon.api.BaudRate
 import com.anrisoftware.rsscon.api.RssconIOException
 import com.anrisoftware.rsscon.utils.RssconTestUtils
@@ -67,7 +67,7 @@ class RssconKeypenDeviceTest extends RssconTestUtils {
 		def inputStream = inputFactory.create rsscon
 		outputStream.write startCommand
 		byte[] data = new byte[64 * 3]
-		TestUtils.shouldFailWith(RssconIOException) { inputStream.read(data) }
+		shouldFailWith(RssconIOException) { inputStream.read(data) }
 		outputStream.write stopCommand
 		outputStream.close()
 	}
@@ -94,29 +94,6 @@ class RssconKeypenDeviceTest extends RssconTestUtils {
 		outputStream.close()
 	}
 
-
-	@Test
-	void "write start and read data block and wait"() {
-		if (!deviceAvailable) {
-			return
-		}
-
-		def device = devicePath
-		def baudRate = BaudRate.BAUDRATE_921600
-		def rsscon = nativeFactory.create device, baudRate
-		rsscon.blocking = true
-		rsscon.wait = true
-		def outputStream = outputFactory.create rsscon
-		def inputStream = inputFactory.create rsscon
-		outputStream.write startCommand
-		byte[] data = new byte[64 * 3]
-		(1..4).each {
-			inputStream.read(data)
-			log.info "Read {}", data
-		}
-		outputStream.write stopCommand
-		outputStream.close()
-	}
 
 	@Test
 	void "write start and read data using a buffer"() {
