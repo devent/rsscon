@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>rsscon-api</artifactId>
-	<version>1.2-SNAPSHOT</version>
+	<version>1.2</version>
 	<name>Rsscon :: API</name>
 	<description>API for reading and writing data to RS-232 (serial) devices.</description>
 	<inceptionYear>2012</inceptionYear>
