@@ -47,6 +47,10 @@ class RssconTestUtils {
 	 * ${rsscon_jni_ldpath}
 	 */
 
+	static {
+		TestUtils.toStringStyle
+	}
+
 	/**
 	 * The device path.
 	 */
@@ -69,11 +73,6 @@ class RssconTestUtils {
 	static NativeRssconOutputStreamFactory outputFactory
 
 	static RssconNativeFactory nativeFactory
-
-	@BeforeClass
-	static void setupToStringStyle() {
-		TestUtils.toStringStyle
-	}
 
 	@BeforeClass
 	static void checkDeviceAvailable() {
