@@ -18,6 +18,7 @@
  */
 package com.anrisoftware.rsscon.nativeimpl;
 
+import static com.anrisoftware.rsscon.nativeimpl.Log4cLibraryNam1eMapper.LIBRARY_NAME;
 import static com.google.inject.Guice.createInjector;
 
 import java.io.IOException;
@@ -69,7 +70,9 @@ public class NativeRssconModule extends AbstractModule {
 		NativeLoaderFactory factory = createInjector(new NativeLoaderModule())
 				.getInstance(NativeLoaderFactory.class);
 		List<String> libs = p.getListProperty("libs");
-		NativeLoader loader = factory.create(libs.toArray(new String[0]));
+		NativeLoader loader = factory.create(libs.toArray(new String[0]))
+				.withLibraryNameMapper(LIBRARY_NAME,
+						new Log4cLibraryNam1eMapper());
 		loader.loadLibrary();
 	}
 
