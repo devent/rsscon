@@ -85,7 +85,7 @@
                 <!-- LGPL3 -->
 				<groupId>com.anrisoftware.nativeloader</groupId>
 				<artifactId>nativeloader-core</artifactId>
-				<version>3.1-SNAPSHOT</version>
+				<version>3.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
