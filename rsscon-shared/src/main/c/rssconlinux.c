@@ -307,6 +307,8 @@ bool rssconlinuxWrite(Rsscon* rsscon, const void* data, size_t length,
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
 	log_enter(log, "rssconlinuxWrite");
 
+    rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR, 0);
+
 	ssize_t ret = write(pdata->fd, data, length);
 	tcdrain(pdata->fd);
 	if (ret == -1) {
@@ -345,6 +347,8 @@ bool rssconlinuxRead(Rsscon* rsscon, void* data, size_t length, size_t* readed) 
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
 	log_enter(log, "rssconlinuxRead");
 
+    rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR, 0);
+    
 	struct timeval tv;
 	fd_set set;
 	ssize_t ret = 0;
