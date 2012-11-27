@@ -25,13 +25,13 @@
 #ifdef __linux
 #include "rssconlinux.h"
 #endif
-#ifdef RSSCON_WINDOWS
+#if defined(_WIN32) || defined(_WIN64)
 #include "rssconwindows.h"
 #endif
 
 #define LOG_CATEGORY "com.anrisoftware.rsscon.keypenruntest"
 
-void printRssconError(const Rsscon* rsscon) {
+void printRssconError(Rsscon* rsscon) {
 	int err = rssconGetLastError(rsscon);
 	if (err == RSSCON_ERROR_NOERROR) {
 		return;
@@ -133,7 +133,7 @@ int main() {
 #ifdef __linux
 	const char* device = "/dev/ttyUSB3";
 #endif
-#ifdef RSSCON_WINDOWS
+#if defined(_WIN32) || defined(_WIN64)
 	const char* device = "COM:5";
 #endif
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
