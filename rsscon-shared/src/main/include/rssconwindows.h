@@ -19,7 +19,7 @@
 #ifndef RSSCON_H
 #define RSSCON_H
 
-#ifdef RSSCON_WINDOWS
+#if defined (_WIN32) || defined (_WIN64)
 
 #endif
 
