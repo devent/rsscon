@@ -36,11 +36,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<linker>
-						<sysLibs>
-							<sysLib>
-								<name>log4c</name>
-							</sysLib>
-						</sysLibs>
+                        <name>g++</name>
 					</linker>
 					<libraries>
 						<library>
