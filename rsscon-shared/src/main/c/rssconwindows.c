@@ -335,11 +335,9 @@ bool rssconwindowsClose(Rsscon* rsscon) {
 
 	rssconSetLastError(rsscon, RSSCON_ERROR_NOERROR, 0);
 
-    const char* device = rssconGetDevice(rsscon);
-	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
-
 	if (!CloseHandle(pdata->portHandle)) {
         rssconSetLastError(rsscon, RSSCON_ERROR_CLOSEDEVICE, GetLastError());
+        const char* device = rssconGetDevice(rsscon);
         log_error(log, "Error closing device '%s': %s", device, strerrno(GetLastError()));
         log_leave(log, "rssconwindowsClose := false");
         free_log();
