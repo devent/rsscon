@@ -35,8 +35,17 @@
 						<sysLibs>
 							<sysLib>
 								<name>log4c</name>
+                            </sysLib>
+                            <sysLib>
+                                <name>expat</name>
+                            </sysLib>
+                            <sysLib>
+                                <name>cygwin</name>
 							</sysLib>
 						</sysLibs>
+                        <options>
+                            <option>-L/usr/lib</option>
+                        </options>
 					</linker>
 					<c>
 						<optimize>full</optimize>
