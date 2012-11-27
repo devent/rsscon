@@ -16,11 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with rsscon-shared. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifdef RSSCON_WINDOWS
+#if defined (_WIN32) || defined (_WIN64)
 
 #include <assert.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdlib.h>
 #include <windows.h>
 
