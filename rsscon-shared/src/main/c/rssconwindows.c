@@ -61,6 +61,28 @@ typedef struct {
 	DWORD writeTotalConstant;
 }Timeout;
 
+static const char* strerrno(DWORD error) {
+    static char buff[22];
+#ifdef UNICODE
+#warning "Unicode specified cannot use format. strerrno returns the error code."
+    snprintf(buff, sizeof(buff), "%d", error);
+#else
+    LPVOID formatbuff;
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        error,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &formatbuff,
+        0, NULL );
+    strncpy(buff, formatbuff, sizeof(buff));
+    LocalFree(formatbuff);
+#endif
+    return buff;
+}
+
 bool rssconwindowsFree(Rsscon* rsscon) {
 	LOG4C_CATEGORY log = get_log(LOG_CATEGORY);
 	log_enter(log, "rssconwindowsFree");
